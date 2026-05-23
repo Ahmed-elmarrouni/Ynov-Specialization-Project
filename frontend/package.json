@@ -10,8 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "apexcharts": "^5.13.0",
+    "axios": "^1.16.1",
+    "plotly.js": "^3.5.1",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-apexcharts": "^2.1.0",
+    "react-dom": "^19.2.6",
+    "react-plotly.js": "^2.6.0",
+    "react-router-dom": "^7.15.1",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
