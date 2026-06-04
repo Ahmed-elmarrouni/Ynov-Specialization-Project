@@ -1,0 +1,25 @@
+id,cohort_module_id,title,type,weight_percentage,max_score,evaluation_date
+1,1,Midterm Exam,Exam,40.0,20.0,2025-11-15
+2,1,Final Project,Project,60.0,20.0,2026-01-20
+3,2,Midterm Exam,Exam,40.0,20.0,2025-11-15
+4,2,Final Project,Project,60.0,20.0,2026-01-20
+5,3,Midterm Exam,Exam,40.0,20.0,2025-11-15
+6,3,Final Project,Project,60.0,20.0,2026-01-20
+7,4,Midterm Exam,Exam,40.0,20.0,2025-11-15
+8,4,Final Project,Project,60.0,20.0,2026-01-20
+9,5,Midterm Exam,Exam,40.0,20.0,2025-11-15
+10,5,Final Project,Project,60.0,20.0,2026-01-20
+11,6,Midterm Exam,Exam,40.0,20.0,2025-11-15
+12,6,Final Project,Project,60.0,20.0,2026-01-20
+13,7,Midterm Exam,Exam,40.0,20.0,2025-11-15
+14,7,Final Project,Project,60.0,20.0,2026-01-20
+15,8,Midterm Exam,Exam,40.0,20.0,2025-11-15
+16,8,Final Project,Project,60.0,20.0,2026-01-20
+17,9,Midterm Exam,Exam,40.0,20.0,2025-11-15
+18,9,Final Project,Project,60.0,20.0,2026-01-20
+19,10,Midterm Exam,Exam,40.0,20.0,2025-11-15
+20,10,Final Project,Project,60.0,20.0,2026-01-20
+21,11,Midterm Exam,Exam,40.0,20.0,2025-11-15
+22,11,Final Project,Project,60.0,20.0,2026-01-20
+23,12,Midterm Exam,Exam,40.0,20.0,2025-11-15
+24,12,Final Project,Project,60.0,20.0,2026-01-20

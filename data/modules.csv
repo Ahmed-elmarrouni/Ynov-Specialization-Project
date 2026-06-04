@@ -1,0 +1,5 @@
+id,code,name,credits,description
+1,DATA-301,Machine Learning Fundamentals,5,Intro to ML
+2,DATA-302,Advanced Python for Data,4,"Pandas, NumPy"
+3,DEV-301,Go Microservices,5,Backend architecture
+4,SYS-301,Cloud Infrastructure,4,AWS & Docker
