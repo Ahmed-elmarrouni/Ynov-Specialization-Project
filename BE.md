@@ -26,3 +26,15 @@ In this phase of the project, I built the database architecture for the EduTrack
 
 7. **Database Seeding (Load)**
    To automatically populate the PostgreSQL database, I built a custom ETL script (`seed_database.py`). Instead of inserting rows one by one, I connected SQLAlchemy to my secure `.env` variables and used the Pandas `to_sql()` function to push entire CSV files into the database in a matter of seconds. Because the database is strictly relational, I programmed the script to insert data in a specific hierarchy to respect foreign key constraints—starting with reference tables (`academic_years`, `users`) and finishing with dependent data (`students`, `grades`). Finally, I made the script idempotent by adding a `TRUNCATE CASCADE` command; this safely wipes old data before inserting new data, allowing me to safely re-run the pipeline anytime without causing duplicates.
+
+8. **FastAPI Application and Database Pooling**
+   I initialized the FastAPI application and configured a robust database connection pool using SQLAlchemy. I set up specific parameters like pool_size and pool_pre_ping to ensure the server can handle multiple requests efficiently without dropping connections. I also added CORS middleware for security and created a /health endpoint to verify the API and database status.
+
+9. **Dashboard Analytics Endpoints**
+   To feed data to the frontend dashboard, I built several API routes. I maintained strict module separation by creating dedicated routers for analytics, modules, and students. I wrote optimized SQLAlchemy queries using database aggregations (func.avg, func.count) to calculate global statistics, identify at-risk students (average < 10 or absences > 3), and analyze module difficulty. I also used Pydantic schemas to validate and serialize the JSON responses properly.
+
+10. **Machine Learning: Automatic Segmentation (Bonus B)**
+    I successfully completed the expert challenge for student segmentation. I wrote a Python script using the scikit-learn library to apply a K-Means clustering algorithm. First, I extracted and standardized the students' average grades and total absences. Then, the algorithm automatically grouped the students into three distinct behavioral profiles (Excellent, Regular, and At-Risk). I exposed this logic through a new /api/v1/ml/segmentation endpoint.
+
+11. **Machine Learning: Predictive Risk Model (Bonus A)**
+    For the final backend feature, I built a predictive model to estimate the probability of a student failing. I trained a Random Forest Classifier using historical behavioral data. To prevent target leakage, I specifically used total absences and evaluation participation as my features rather than the current grades. I exposed this model via an API endpoint (/api/v1/ml/predict/{student_id}) that returns the calculated failure probability and a boolean risk alert for any specific student.
