@@ -38,3 +38,6 @@ In this phase of the project, I built the database architecture for the EduTrack
 
 11. **Machine Learning: Predictive Risk Model (Bonus A)**
     For the final backend feature, I built a predictive model to estimate the probability of a student failing. I trained a Random Forest Classifier using historical behavioral data. To prevent target leakage, I specifically used total absences and evaluation participation as my features rather than the current grades. I exposed this model via an API endpoint (/api/v1/ml/predict/{student_id}) that returns the calculated failure probability and a boolean risk alert for any specific student.
+
+12. **Authentication, RBAC, and Data Import**
+    To secure the platform, I implemented a comprehensive authentication system using JWT (JSON Web Tokens) and password hashing with Bcrypt. I integrated an SMTP email service to handle Two-Factor Authentication (2FA) during login, password resets, and account invitations. To ensure data privacy, I built a custom Role-Based Access Control (RBAC) dependency. This enforces a strict hierarchy (Admin, Pedagogical Manager, Teacher, Student), guaranteeing that users can only access data appropriate for their role. Finally, I developed a secure data import endpoint that allows authorized staff to upload and process CSV files, completing the core architectural requirements.
