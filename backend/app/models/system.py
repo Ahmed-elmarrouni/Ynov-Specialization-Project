@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON, Boolean
 from app.core.database import Base
 import datetime
 
@@ -11,6 +11,7 @@ class User(Base):
     phone_number = Column(String)
     password_hash = Column(String, nullable=False)
     role = Column(String)
+    is_2fa_enabled = Column(Boolean, default=False)
     last_login = Column(DateTime)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, onupdate=datetime.datetime.utcnow)

@@ -1,69 +1,88 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
+from typing import Optional
+
 from app.core.database import get_db
 from app.models.system import User
 from app.core import security
 from app.services.email import EmailService
-from datetime import datetime, timedelta
 
 router = APIRouter()
+
+# --- Schemas ---
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class LoginResponse(BaseModel):
+    access_token: Optional[str] = None
+    token_type: Optional[str] = None
+    requires_2fa: bool
+    message: str
+
 class Verify2FARequest(BaseModel):
     email: EmailStr
     code: str
 
-class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
 
-class ResetPasswordRequest(BaseModel):
-    token: str
-    new_password: str
+# --- Routes ---
 
-@router.post("/login")
+@router.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
+    """
+    Initial login attempt. Detects if 2FA is needed and responds accordingly.
+    """
     user = db.query(User).filter(User.email == request.email).first()
+    
     if not user or not security.verify_password(request.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials"
+        )
     
-    code = security.generate_verification_code()
-    # In a full implementation, save code to DB with expiry
-    EmailService.send_2fa_code(user.email, code)
+    if user.is_2fa_enabled:
+        # Simulate code generation and storage
+        # In production, use Redis or a specific DB table for these codes
+        dummy_code = "123456"
+        EmailService.send_2fa_code(user.email, dummy_code)
+        
+        return LoginResponse(
+            requires_2fa=True,
+            message="A verification code has been sent to your email."
+        )
     
-    return {"message": "2FA code sent to email"}
+    # Return JWT immediately if 2FA is disabled
+    access_token = security.create_access_token(data={"sub": str(user.id), "role": user.role})
+    return LoginResponse(
+        access_token=access_token,
+        token_type="bearer",
+        requires_2fa=False,
+        message="Login successful."
+    )
 
-@router.post("/verify-2fa")
+@router.post("/verify-2fa", response_model=TokenResponse)
 def verify_2fa(request: Verify2FARequest, db: Session = Depends(get_db)):
+    """
+    Validates the 2FA code and issues the final access token.
+    """
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
-    # Logic to check code from DB/Redis would go here
+    # Mock verification logic
+    if request.code != "123456":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code"
+        )
     
     access_token = security.create_access_token(data={"sub": str(user.id), "role": user.role})
-    return {"access_token": access_token, "token_type": "bearer"}
-
-@router.post("/forgot-password")
-def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == request.email).first()
-    if user:
-        reset_token = security.create_access_token(
-            data={"sub": str(user.id), "scope": "password_reset"}, 
-            expires_delta=timedelta(minutes=15)
-        )
-    return {"message": "If the email exists, a reset link has been sent"}
-
-@router.post("/reset-password")
-def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
-    payload = security.decode_token(request.token)
-    if payload.get("scope") != "password_reset":
-        raise HTTPException(status_code=400, detail="Invalid token scope")
-    
-    user = db.query(User).filter(User.id == int(payload["sub"])).first()
-    user.password_hash = security.hash_password(request.new_password)
-    db.commit()
-    return {"message": "Password updated successfully"}
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer"
+    )

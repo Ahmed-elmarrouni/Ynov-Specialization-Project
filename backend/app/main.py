@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.api.routes import analytics, modules, students, ml, auth, invitations
 from app.core.database import get_db
+from app.core import security
 
 
 def create_application() -> FastAPI:
@@ -14,6 +15,7 @@ def create_application() -> FastAPI:
         title="EduTrack Analytics API",
         description="Backend for analyzing student academic performance",
         version="1.0.0",
+        dependencies=[Depends(security.security_scheme)]
     )
 
     # CORS config
