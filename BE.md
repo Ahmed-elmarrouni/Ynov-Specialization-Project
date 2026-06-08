@@ -51,3 +51,5 @@ Database ID Conflict: When I tried to add test users, the database threw an erro
 Swagger UI Problems: FastAPI's default login popup didn't work with my custom 2FA setup. I fixed this by updating the endpoints and using a simple "Bearer token" box in the Swagger documentation instead.
 
 2FA Login Flow: It was difficult to pause the login process to wait for the 2FA email code. I solved this by splitting the login into two clear steps (/login and /verify-2fa) and safely saving the temporary codes in the database.
+
+Secure File Handling: To prevent malicious uploads in the data import feature, I implemented strict MIME type validation and used Pandas to catch empty or corrupt CSV files before they could process and crash the server.

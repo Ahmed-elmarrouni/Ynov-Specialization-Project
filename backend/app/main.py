@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.api.routes import analytics, modules, students, ml, auth, invitations
+from app.api.routes import analytics, modules, students, ml, auth, invitations, imports
 from app.core.database import get_db
 from app.core import security
 
@@ -15,7 +15,7 @@ def create_application() -> FastAPI:
         title="EduTrack Analytics API",
         description="Backend for analyzing student academic performance",
         version="1.0.0",
-        dependencies=[Depends(security.security_scheme)]
+        dependencies=[Depends(security.security_scheme)],
     )
 
     # CORS config
@@ -27,7 +27,6 @@ def create_application() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # routers
     application.include_router(
         auth.router, prefix="/api/v1/auth", tags=["Authentication"]
     )
@@ -45,6 +44,9 @@ def create_application() -> FastAPI:
     )
     application.include_router(
         ml.router, prefix="/api/v1/ml", tags=["Machine Learning"]
+    )
+    application.include_router(
+        imports.router, prefix="/api/v1/imports", tags=["Data Import"]
     )
 
     return application
