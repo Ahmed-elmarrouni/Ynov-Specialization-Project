@@ -3,6 +3,7 @@ import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+
 class EmailService:
     @staticmethod
     def send_email(subject: str, recipient: str, body: str):
@@ -19,13 +20,17 @@ class EmailService:
         msg.attach(MIMEText(body, "html"))
 
         try:
+            print(f"Attempting to send email to {recipient} via {host}...")
             with smtplib.SMTP(host, port) as server:
+                server.set_debuglevel(1)
                 server.starttls()
+                print("Logging in...")
                 server.login(user, password)
+                print("Sending message...")
                 server.send_message(msg)
+                print("Email sent successfully!")
         except Exception as e:
-            # Proper production logging should be here
-            print(f"SMTP Error: {e}")
+            print(f"CRITICAL SMTP ERROR: {e}")
 
     @staticmethod
     def send_2fa_code(email: str, code: str):

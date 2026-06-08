@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON, Bool
 from app.core.database import Base
 import datetime
 
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -12,9 +13,13 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     role = Column(String)
     is_2fa_enabled = Column(Boolean, default=False)
+    two_factor_code = Column(String, nullable=True)
+    two_factor_expires = Column(DateTime, nullable=True)
+
     last_login = Column(DateTime)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, onupdate=datetime.datetime.utcnow)
+
 
 class DataImport(Base):
     __tablename__ = "data_imports"

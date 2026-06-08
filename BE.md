@@ -40,4 +40,14 @@ In this phase of the project, I built the database architecture for the EduTrack
     For the final backend feature, I built a predictive model to estimate the probability of a student failing. I trained a Random Forest Classifier using historical behavioral data. To prevent target leakage, I specifically used total absences and evaluation participation as my features rather than the current grades. I exposed this model via an API endpoint (/api/v1/ml/predict/{student_id}) that returns the calculated failure probability and a boolean risk alert for any specific student.
 
 12. **Authentication, RBAC, and Data Import**
-    To secure the platform, I implemented a comprehensive authentication system using JWT (JSON Web Tokens) and password hashing with Bcrypt. I integrated an SMTP email service to handle Two-Factor Authentication (2FA) during login, password resets, and account invitations. To ensure data privacy, I built a custom Role-Based Access Control (RBAC) dependency. This enforces a strict hierarchy (Admin, Pedagogical Manager, Teacher, Student), guaranteeing that users can only access data appropriate for their role. Finally, I developed a secure data import endpoint that allows authorized staff to upload and process CSV files, completing the core architectural requirements.
+    To secure the platform, I built an authentication system using JWT and Bcrypt. I added an email service for optional Two-Factor Authentication (2FA), password resets, and user invites. I also created a Role-Based Access Control (RBAC) system so that Admins, Managers, Teachers, and Students can only access data allowed for their specific role. Finally, I developed a secure endpoint for staff to upload CSV files, completing the main backend setup.
+
+    **_Technical Issues I Conquered:_**
+
+Bcrypt Version Error: I got a password hashing error due to a library conflict. I fixed this by installing an older, compatible version of the bcrypt library.
+
+Database ID Conflict: When I tried to add test users, the database threw an error because the ID numbers were out of order. I solved this by completely resetting the database and running fresh migrations.
+
+Swagger UI Problems: FastAPI's default login popup didn't work with my custom 2FA setup. I fixed this by updating the endpoints and using a simple "Bearer token" box in the Swagger documentation instead.
+
+2FA Login Flow: It was difficult to pause the login process to wait for the 2FA email code. I solved this by splitting the login into two clear steps (/login and /verify-2fa) and safely saving the temporary codes in the database.
