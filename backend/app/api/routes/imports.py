@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 import pandas as pd
 import io
-
 from app.core.database import get_db
 from app.models.system import User
 from app.core import security
+from app.etl.pipeline import process_student_import
 
 router = APIRouter()
 
@@ -19,34 +19,30 @@ async def upload_data(
     db: Session = Depends(get_db),
 ):
     """
-    Uploads and processes a CSV data file.
-    Validates file extension and Content-Type for security.
+    Uploads and persists student data using the ETL pipeline.
     """
-    # Double validation: Extension and MIME type
-    is_csv = file.filename.endswith(".csv")
-    is_csv_mime = file.content_type in ["text/csv", "application/vnd.ms-excel"]
-
-    if not (is_csv or is_csv_mime):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid file format. Please upload a valid CSV file.",
-        )
-
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Invalid file format.")
     try:
         contents = await file.read()
         df = pd.read_csv(io.BytesIO(contents))
 
-        if df.empty:
-            raise pd.errors.EmptyDataError("DataFrame is empty")
-
+        # Required columns check
+        required_cols = {"first_name", "last_name", "email"}
+        if not required_cols.issubset(df.columns):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing columns: {required_cols - set(df.columns)}",
+            )
+        result = process_student_import(df, db, current_user.id, file.filename)
         return {
-            "message": "File processed and validated.",
-            "file_name": file.filename,
-            "total_rows_detected": len(df),
-            "columns_detected": list(df.columns),
+            "message": "Import process finished.",
+            "import_id": result.id,
+            "total_rows": result.total_rows,
+            "success_count": result.success_rows,
+            "error_count": result.error_rows,
+            "status": result.status,
         }
-
-    except pd.errors.EmptyDataError:
-        raise HTTPException(status_code=400, detail="The uploaded CSV file is empty.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Data processing failed: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"ETL Failure: {str(e)}")

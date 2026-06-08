@@ -53,3 +53,14 @@ Swagger UI Problems: FastAPI's default login popup didn't work with my custom 2F
 2FA Login Flow: It was difficult to pause the login process to wait for the 2FA email code. I solved this by splitting the login into two clear steps (/login and /verify-2fa) and safely saving the temporary codes in the database.
 
 Secure File Handling: To prevent malicious uploads in the data import feature, I implemented strict MIME type validation and used Pandas to catch empty or corrupt CSV files before they could process and crash the server.
+
+13. **ETL Pipeline, Analytics Enhancements, and Automated Reporting**
+    To complete the backend requirements, I implemented a robust ETL (Extract, Transform, Load) pipeline that handles data cleaning, duplicate removal, and bulk database persistence while logging processing metrics. I enhanced the analytics module by adding pass-rate calculations and a class comparison feature, allowing for detailed pedagogical insights. I also introduced a recommendation system within the at-risk student module that provides actionable pedagogical advice. Finally, I implemented an automated report generation feature that compiles key KPIs and student risk profiles into a professional, styled HTML document, completing all core and bonus requirements.
+    **_Technical Issues I Conquered:_**
+    Data Persistence & ETL: Integrated the CSV processing pipeline with SQLAlchemy to map records directly into the User and Student domain models, ensuring data consistency.
+
+    SQL Aggregation Efficiency: Replaced Python-side data processing with SQL subqueries in analytics.py to efficiently calculate global pass rates and class-specific metrics without overloading memory.
+
+    Database Sequence Desync: Resolved UniqueViolation errors caused by PostgreSQL ID sequence mismatches after bulk CSV imports by updating the database sequence counter.
+
+    Automated HTML Generation: Developed a reporting service that dynamically injects calculated KPIs and at-risk student lists into a professional HTML template, providing actionable data for administrators.
