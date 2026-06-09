@@ -17,16 +17,6 @@ pipeline {
             }
         }
 
-        // stage('Build') {
-        //     steps {
-        //         echo 'Building Docker images...'
-        //         sh '''
-        //             cp /home/azureuser/edutrack/backend/.env backend/.env
-        //             docker-compose -f ${DOCKER_COMPOSE_FILE} build --no-cache
-        //         '''
-        //     }
-        // }
-
         stage('Build') {
             steps {
                 echo 'Building Docker images...'
@@ -39,11 +29,12 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running backend tests...'
-                sh '''
-                    docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend \
-                        python -m pytest tests/ -v --tb=short || true
-                '''
+                echo 'Running backend tests... (Skipping for now as tests directory is empty)'
+                // echo 'Running backend tests...'
+                // sh '''
+                //     docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend \
+                //         python -m pytest tests/ -v --tb=short || true
+                // '''
             }
         }
 
