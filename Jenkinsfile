@@ -32,7 +32,7 @@ pipeline {
                 echo 'Building Docker images...'
                 sh '''
                     cp /home/azureuser/edutrack/backend/.env ./backend/.env
-                    docker-compose -f ${DOCKER_COMPOSE_FILE} build --no-cache
+                    docker-compose -f ${DOCKER_COMPOSE_FILE} build
                 '''
             }
         }
