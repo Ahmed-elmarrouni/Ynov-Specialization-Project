@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: edutrack-backend
     ports:
-      - "8080:8000"
+      - "8000:8000"
     volumes:
       - ./data:/app/data
     env_file:
