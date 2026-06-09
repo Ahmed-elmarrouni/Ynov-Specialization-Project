@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 alembic==1.16.5
 altgraph==0.17.2
 annotated-doc==0.0.4
