@@ -184,7 +184,8 @@ def get_at_risk_students(db: Session = Depends(get_db)):
         .join(User, Student.user_id == User.id)
         .outerjoin(grade_sub, Student.id == grade_sub.c.student_id)
         .outerjoin(absence_sub, Student.id == absence_sub.c.student_id)
-        .filter((grade_sub.c.avg_score < 10.0) | (absence_sub.c.absence_count > 3))
+        # .filter((grade_sub.c.avg_score < 10.0) | (absence_sub.c.absence_count > 3))
+        .filter((grade_sub.c.avg_score < 10.0) | (absence_sub.c.abs_count > 3))
         .all()
     )
     at_risk = []

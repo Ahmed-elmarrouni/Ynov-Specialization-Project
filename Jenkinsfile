@@ -20,7 +20,10 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building Docker images...'
-                sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} build --no-cache'
+                sh '''
+                    cp /home/azureuser/edutrack/backend/.env backend/.env
+                    docker-compose -f ${DOCKER_COMPOSE_FILE} build --no-cache
+                '''
             }
         }
 
