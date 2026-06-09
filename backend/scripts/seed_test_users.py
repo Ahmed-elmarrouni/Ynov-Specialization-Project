@@ -1,7 +1,7 @@
 import sys
 import os
+from sqlalchemy import text
 
-# Add the backend directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.core.database import SessionLocal
@@ -11,6 +11,21 @@ from app.core import security
 
 def seed_users():
     db = SessionLocal()
+
+    print("Starting database seeding...")
+
+    try:
+        db.execute(
+            text(
+                "SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM users;"
+            )
+        )
+        db.commit()
+        print("Successfully synced 'users' table ID sequence.")
+    except Exception as e:
+        db.rollback()
+        print(f"Sequence sync skipped (ignore if not using PostgreSQL): {e}")
+    # -------------------------------------------
 
     test_users = [
         {
@@ -38,8 +53,6 @@ def seed_users():
             "last_name": "User",
         },
     ]
-
-    print("Starting database seeding...")
 
     for user_data in test_users:
         user = db.query(User).filter(User.email == user_data["email"]).first()

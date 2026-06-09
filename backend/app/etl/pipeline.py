@@ -10,7 +10,7 @@ def process_student_import(df: pd.DataFrame, db: Session, user_id: int, file_nam
     Cleans student data and persists it to User and Student tables.
     Returns the DataImport record with results.
     """
-    # 1. Initialize Import Record
+    # 1. Import Record
     import_record = DataImport(
         uploaded_by=user_id,
         file_name=file_name,
@@ -31,7 +31,7 @@ def process_student_import(df: pd.DataFrame, db: Session, user_id: int, file_nam
     # 3. Persistence Logic
     for _, row in df.iterrows():
         try:
-            # Check if user already exists
+            # CheckinG if user already exists
             existing_user = db.query(User).filter(User.email == row["email"]).first()
             if existing_user:
                 error_count += 1

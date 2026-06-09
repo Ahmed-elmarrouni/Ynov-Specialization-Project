@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.system import User
+from passlib.context import CryptContext
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "secret")
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
@@ -89,4 +90,9 @@ class RequireRole:
 
 def generate_2fa_code() -> str:
     """Generates a secure 6-digit numeric code."""
+    return "".join(secrets.choice(string.digits) for _ in range(6))
+
+
+def generate_verification_code() -> str:
+    """Generates a secure 6-digit numeric code for resets/changes."""
     return "".join(secrets.choice(string.digits) for _ in range(6))

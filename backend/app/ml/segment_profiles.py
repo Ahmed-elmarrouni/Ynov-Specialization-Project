@@ -13,7 +13,7 @@ def segment_students(db: Session):
     Groups students into 3 clusters (Excellent, Regular, At-Risk)
     based on average grades and total absences.
     """
-    # 1. Data Extraction
+    # Data Extraction
     grades_query = (
         db.query(Grade.student_id, func.avg(Grade.score).label("avg_grade"))
         .filter(Grade.is_absent == False)
@@ -41,16 +41,16 @@ def segment_students(db: Session):
     if len(df) < 3:
         return {int(sid): "Insufficient Data" for sid in df["student_id"]}
 
-    # 2. Preprocessing
+    # 2nd  Preprocessing
     scaler = StandardScaler()
     features = ["avg_grade", "total_absences"]
     scaled_data = scaler.fit_transform(df[features])
 
-    # 3. K-Means Clustering
+    #  K-Means Clustering
     kmeans = KMeans(n_clusters=3, n_init=10, random_state=42)
     df["cluster"] = kmeans.fit_predict(scaled_data)
 
-    # 4. Cluster Naming Logic based on Grade Performance
+    #  Cluster Naming Logic based on Grade Performance
     cluster_means = (
         df.groupby("cluster")["avg_grade"].mean().sort_values(ascending=False)
     )

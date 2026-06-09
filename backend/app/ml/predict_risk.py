@@ -11,7 +11,7 @@ def predict_student_risk(student_id: int, db: Session):
     Trains a Random Forest model on current student data and predicts 
     the risk of failure (average < 10) for a specific student.
     """
-    # 1. Data Extraction
+    # Data Extraction
     grades_query = db.query(
         Grade.student_id,
         func.avg(Grade.score).label("avg_grade"),
@@ -30,20 +30,20 @@ def predict_student_risk(student_id: int, db: Session):
     if df.empty or len(df) < 5:
         return 0.0, False
 
-    # 2. Labeling and Feature Selection
+    #  Labeling and Feature Selection
     df["target"] = (df["avg_grade"] < 10.0).astype(int)
     features = ["total_absences", "grade_count"]
     X = df[features]
     y = df["target"]
 
-    # 3. Preprocessing and Training
+    # Preprocessing and Training
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_scaled, y)
 
-    # 4. Prediction
+    # Prediction
     student_data = df[df["student_id"] == student_id]
     if student_data.empty:
         return 0.0, False

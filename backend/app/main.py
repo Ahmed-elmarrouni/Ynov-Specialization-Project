@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.api.routes import analytics, modules, students, ml, auth, invitations, imports, reports
+from app.api.routes import analytics, modules, students, ml, auth, invitations, imports, reports, users, dashboard
 from app.core.database import get_db
 from app.core import security
 
@@ -34,8 +34,14 @@ def create_application() -> FastAPI:
         invitations.router, prefix="/api/v1/invitations", tags=["RBAC"]
     )
     application.include_router(
+        users.router, prefix="/api/v1/users", tags=["Users"]
+    )
+    application.include_router(
         analytics.router, prefix="/api/v1/analytics", tags=["Analytics"]
     )
+    application.include_router(
+        dashboard.router, prefix="/api/v1/dashboard", tags=["Dashboard"]
+    )    
     application.include_router(
         modules.router, prefix="/api/v1/modules", tags=["Modules"]
     )

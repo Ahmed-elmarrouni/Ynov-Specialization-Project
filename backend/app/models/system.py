@@ -13,8 +13,8 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     role = Column(String)
     is_2fa_enabled = Column(Boolean, default=False)
-    two_factor_code = Column(String, nullable=True)
-    two_factor_expires = Column(DateTime, nullable=True)
+    verification_code = Column(String, nullable=True)
+    verification_code_expires = Column(DateTime, nullable=True)
 
     last_login = Column(DateTime)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

@@ -1,17 +1,21 @@
 import pandas as pd
 import random
 import os
+import sys
 from faker import Faker
 from datetime import datetime, timedelta
 
-# Faker Initializiation
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from app.core import security
+
 fake = Faker("fr_FR")
 output_dir = "/Users/ahmed/Ynov/Specialization Project/data"
 os.makedirs(output_dir, exist_ok=True)
 
+hashed_password = security.hash_password("password123")
+
 print("Starting Enterprise Data Generation...")
 
-# 1. Academic Structure
 academic_years = pd.DataFrame(
     [
         {
@@ -96,7 +100,7 @@ modules = pd.DataFrame(
     ]
 )
 
-# 2. users, teachers, & students
+# users, teachers, & students
 num_students = 1000
 num_teachers = 15
 num_admins = 5
@@ -109,6 +113,7 @@ for i in range(1, total_users + 1):
         if i <= num_students
         else ("teacher" if i <= num_students + num_teachers else "admin")
     )
+
     users_data.append(
         {
             "id": i,
@@ -116,11 +121,13 @@ for i in range(1, total_users + 1):
             "last_name": fake.last_name(),
             "email": fake.unique.email(),
             "phone_number": fake.phone_number(),
-            "password_hash": "pbkdf2:sha256:50000$dummyhash",
+            "password_hash": hashed_password,
             "role": role,
             "created_at": datetime.now(),
         }
     )
+
+
 users = pd.DataFrame(users_data)
 
 teachers_data = []
@@ -159,6 +166,34 @@ for i, user in users[users["role"] == "student"].iterrows():
         "truancy": random.uniform(0.01, 0.15),
     }
 students = pd.DataFrame(students_data)
+
+
+# ---  Attendance Records ---
+attendance_data = []
+att_id = 1
+for _, student in students.iterrows():
+    s_id = student["id"]
+    traits = student_traits[s_id]
+
+    for i in range(10):
+        is_absent = random.random() < traits["truancy"]
+        status = "Absent" if is_absent else "Present"
+
+        attendance_data.append(
+            {
+                "id": att_id,
+                "student_id": s_id,
+                "date": (
+                    datetime.now() - timedelta(days=random.randint(1, 90))
+                ).strftime("%Y-%m-%d"),
+                "status": status,
+                "reason": "Sick" if is_absent and random.random() > 0.5 else "",
+            }
+        )
+        att_id += 1
+
+attendance_records = pd.DataFrame(attendance_data)
+
 
 # 3. scheduling & curriculum
 cohort_modules_data = []
@@ -258,6 +293,7 @@ datasets = {
     "cohort_modules": cohort_modules,
     "evaluations": evaluations,
     "grades": grades,
+    "attendance_records": attendance_records,
 }
 
 for name, df in datasets.items():

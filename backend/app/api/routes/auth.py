@@ -11,8 +11,6 @@ from app.services.email import EmailService
 
 router = APIRouter()
 
-
-# --- Pydantic Schemas ---
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
@@ -44,13 +42,17 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class ResetPasswordRequest(BaseModel):
-    token: str
+    email: EmailStr
+    code: str
     new_password: str
 
 
-# --- API Routes ---
+# --- Routes ---
 @router.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
+    """
+    Initial login attempt. Detects if 2FA is needed and responds accordingly.
+    """
     user = db.query(User).filter(User.email == request.email).first()
 
     if not user or not security.verify_password(request.password, user.password_hash):
@@ -58,21 +60,36 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
 
+        # --- for debugging ---
+    print(f"DEBUG: Attempting login for: {user.email}")
+    print(f"DEBUG: Hash in DB: {user.password_hash}")
+    is_valid = security.verify_password(request.password, user.password_hash)
+    print(f"DEBUG: Password verification result: {is_valid}")
+
     if user.is_2fa_enabled:
-        security_code = security.generate_2fa_code()
-        user.two_factor_code = security_code
-        user.two_factor_expires = datetime.utcnow() + timedelta(minutes=10)
+        code = security.generate_2fa_code()
+        user.verification_code = code
+        user.verification_code_expires = datetime.utcnow() + timedelta(minutes=10)
         db.commit()
 
-        EmailService.send_2fa_code(user.email, security_code)
+        EmailService.send_2fa_code(user.email, code)
 
         return LoginResponse(
             requires_2fa=True,
             message="A verification code has been sent to your email.",
         )
 
+    # access_token = security.create_access_token(
+    #     data={"sub": str(user.id), "role": user.role}
+    # )
+
     access_token = security.create_access_token(
-        data={"sub": str(user.id), "role": user.role}
+        data={
+            "sub": str(user.id),
+            "role": user.role,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
     )
     return LoginResponse(
         access_token=access_token,
@@ -84,31 +101,35 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/verify-2fa", response_model=TokenResponse)
 def verify_2fa(request: Verify2FARequest, db: Session = Depends(get_db)):
+    """
+    Validates the 2FA code and issues the final access token.
+    """
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
-    if not user.two_factor_code or user.two_factor_code != request.code:
+    if not user.verification_code or user.verification_code != request.code:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid verification code",
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid verification code"
         )
 
-    if not user.two_factor_expires or user.two_factor_expires < datetime.utcnow():
+    if datetime.utcnow() > user.verification_code_expires:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification code expired",
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code expired"
         )
 
-    # Clear the 2FA fields upon successful verification
-    user.two_factor_code = None
-    user.two_factor_expires = None
+    user.verification_code = None
     db.commit()
 
     access_token = security.create_access_token(
-        data={"sub": str(user.id), "role": user.role}
+        data={
+            "sub": str(user.id),
+            "role": user.role,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
     )
     return TokenResponse(access_token=access_token, token_type="bearer")
 
@@ -131,29 +152,31 @@ def toggle_2fa(
 def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == request.email).first()
     if user:
-        reset_token = security.create_access_token(
-            data={"sub": str(user.id), "scope": "password_reset"},
-            expires_delta=timedelta(minutes=15),
+        code = security.generate_verification_code()
+        user.verification_code = code
+        user.verification_code_expires = datetime.utcnow() + timedelta(minutes=15)
+        db.commit()
+
+        EmailService.send_email(
+            subject="EduTrack - Password Reset Code",
+            recipient=user.email,
+            body=f"Your code to reset your password is: <b>{code}</b>. If you did not request this, please ignore this email.",
         )
     return {
-        "message": "If the account exists, a reset link has been sent to the email."
+        "message": "If the account exists, a reset code has been sent to the email."
     }
 
 
 @router.post("/reset-password")
 def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
-    payload = security.decode_token(request.token)
-    if payload.get("scope") != "password_reset":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token scope"
-        )
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user or user.verification_code != request.code:
+        raise HTTPException(status_code=400, detail="Invalid code or email")
 
-    user = db.query(User).filter(User.id == int(payload["sub"])).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+    if datetime.utcnow() > user.verification_code_expires:
+        raise HTTPException(status_code=400, detail="Code expired")
 
     user.password_hash = security.hash_password(request.new_password)
+    user.verification_code = None
     db.commit()
     return {"message": "Password updated successfully."}
