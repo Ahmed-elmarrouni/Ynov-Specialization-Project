@@ -51,7 +51,7 @@ pipeline {
                         ssh ${DEPLOY_USER}@${DEPLOY_HOST} "
                             cd ${PROJECT_DIR} &&
                             docker-compose down &&
-                            docker-compose up -d --build
+                            docker-compose up -d
                         "
                     '''
                 }
