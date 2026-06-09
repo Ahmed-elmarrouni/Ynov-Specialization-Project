@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: edutrack-backend
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_URL=sqlite:////app/data/edutrack.db
+    networks:
+      - edutrack-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: edutrack-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - edutrack-network
+
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: edutrack-jupyter
+    ports:
+      - "8889:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+    environment:
+      - JUPYTER_TOKEN=edutrack_secret
+    networks:
+      - edutrack-network
+
+networks:
+  edutrack-network:
+    driver: bridge

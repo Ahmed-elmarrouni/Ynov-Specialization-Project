@@ -9,7 +9,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 from app.core import security
 
 fake = Faker("fr_FR")
-output_dir = "/Users/ahmed/Ynov/Specialization Project/data"
+# output_dir = "/Users/ahmed/Ynov/Specialization Project/data"
+output_dir = os.getenv("DATA_DIR", "/app/data")
 os.makedirs(output_dir, exist_ok=True)
 
 hashed_password = security.hash_password("password123")

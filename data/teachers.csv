@@ -1,16 +1,16 @@
 id,user_id,specialty
 1,1001,Cloud Ops
-2,1002,Backend
-3,1003,Mathematics
-4,1004,Backend
-5,1005,Backend
-6,1006,Cloud Ops
+2,1002,Data Science
+3,1003,Data Science
+4,1004,Data Science
+5,1005,Data Science
+6,1006,Backend
 7,1007,Backend
-8,1008,Mathematics
-9,1009,Backend
-10,1010,Data Science
+8,1008,Data Science
+9,1009,Data Science
+10,1010,Cloud Ops
 11,1011,Cloud Ops
 12,1012,Mathematics
-13,1013,Backend
-14,1014,Mathematics
-15,1015,Mathematics
+13,1013,Mathematics
+14,1014,Data Science
+15,1015,Cloud Ops

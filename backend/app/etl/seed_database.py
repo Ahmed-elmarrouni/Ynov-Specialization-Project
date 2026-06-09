@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import sys
+from datetime import datetime
 from app.core.database import engine, Base, SessionLocal
 from app.models.system import User
 from app.models.student import Student, Teacher
@@ -17,7 +18,7 @@ from app.models.academic import (
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-DATA_DIR = "/Users/ahmed/Ynov/Specialization Project/data"
+DATA_DIR = os.getenv("DATA_DIR", "/app/data")
 
 #!!!! CORRECT ORDER: Parents must come before children
 TABLES_CONFIG = [
@@ -33,7 +34,6 @@ TABLES_CONFIG = [
     ("grades.csv", Grade),
     ("attendance_records.csv", AttendanceRecord),
 ]
-
 
 def seed_database():
     print("--- Starting Full-Integrity ORM Seeding ---")
@@ -52,7 +52,23 @@ def seed_database():
             print(f"Importing {filename} ({len(df)} rows)...")
 
             for _, row in df.iterrows():
-                data = {k: v for k, v in row.to_dict().items() if hasattr(Model, k)}
+                data = {}
+                for k, v in row.to_dict().items():
+                    if pd.isna(v): 
+                        continue
+                    
+                    if hasattr(Model, k):
+                        if isinstance(v, str) and len(v) >= 10 and v[4] == '-' and v[7] == '-':
+                            try:
+                                if len(v) == 10:  
+                                    v = datetime.strptime(v, "%Y-%m-%d").date()
+                                else:  
+                                    v = datetime.strptime(v[:19], "%Y-%m-%d %H:%M:%S")
+                            except Exception:
+                                pass
+                        
+                        data[k] = v
+                
                 db.add(Model(**data))
 
             db.commit()
