@@ -29,7 +29,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running backend tests... (Skipping for now as tests directory is empty)'
+                echo 'Running backend tests...'
                 // echo 'Running backend tests...'
                 // sh '''
                 //     docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend \
