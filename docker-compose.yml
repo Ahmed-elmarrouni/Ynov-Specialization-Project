@@ -15,10 +15,24 @@ services:
     networks:
       - edutrack-network
 
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: edutrack-frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - edutrack-network
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://68.221.161.128:8000/api/v1
     container_name: edutrack-frontend
     ports:
       - "3000:80"
