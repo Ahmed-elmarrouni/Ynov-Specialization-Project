@@ -21,9 +21,9 @@ Explore the project details and visual documentation below:
 
 _Click on an image to view in full resolution._
 
-| **ETL Pipeline**                                                                      | **Database Schema**                                                    | **Project Tree**                                                                 |
-| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [View Diagram](https://www.google.com/search?q=diagrams/ETL-Architecture-Diagram.svg) | [View Diagram](https://www.google.com/search?q=diagrams/DB-Schema.svg) | [View Diagram](https://www.google.com/search?q=diagrams/ProjectTree-diagram.svg) |
+| **ETL Pipeline**                                        | **Database Schema**                      | **Project Tree**                                    |
+| ------------------------------------------------------- | ---------------------------------------- | --------------------------------------------------- |
+| [View Diagram](./diagrams/ETL-Architecture-Diagram.svg) | [View Diagram](./diagrams/DB-Schema.svg) | [View Diagram](./diagrams//ProjectTree-diagram.svg) |
 
 ---
 
