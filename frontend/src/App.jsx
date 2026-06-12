@@ -6,6 +6,7 @@ import DashboardPage from './features/dashboard/DashboardPage';
 import SettingsPage from './features/settings/SettingsPage';
 import StudentsPage from './features/students/StudentsPage';
 import ModulesPage from './features/modules/ModulesPage';
+import ImportPage from './features/imports/ImportPage';
 import ErrorPage from './components/ErrorPage';
 
 const ProtectedRoute = ({ children }) => {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       { index: true, element: <DashboardPage /> },
       { path: "students", element: <StudentsPage /> },
       { path: "modules", element: <ModulesPage /> },
+      { path: "import", element: <ImportPage /> },
       { path: "settings", element: <SettingsPage /> },
     ],
   },

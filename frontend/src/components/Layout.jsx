@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigation, useNavigate } from 'react-rou
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Users, BookOpen, Settings,
-  LogOut, Menu, ChevronLeft, UserCircle
+  LogOut, Menu, ChevronLeft, UserCircle, Upload
 } from 'lucide-react';
 import GlobalLoader from './GlobalLoader';
 
@@ -63,6 +63,7 @@ const Layout = () => {
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Students', path: '/students', icon: Users },
     { name: 'Modules', path: '/modules', icon: BookOpen },
+    { name: 'Import', path: '/import', icon: Upload },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+// import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, UserPlus, Search, ChevronLeft, ChevronRight, GraduationCap,
@@ -211,6 +212,8 @@ const StudentsPage = () => {
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ status: '', cohort_id: '' });
 
+
+  const [expandedRow, setExpandedRow] = useState(null);
   // Sorting State
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
@@ -364,7 +367,7 @@ const StudentsPage = () => {
                 <SortableHeader label="Absences" sortKey="total_absences" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/30 relative">
+            {/* <tbody className="divide-y divide-border/30 relative">
               <AnimatePresence mode="popLayout">
                 {isLoading ? (
                   <tr>
@@ -416,6 +419,122 @@ const StudentsPage = () => {
                         </div>
                       </td>
                     </motion.tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="py-20 text-center text-text-muted">
+                      No students found matching your criteria.
+                    </td>
+                  </tr>
+                )}
+              </AnimatePresence>
+            </tbody> */}
+
+            <tbody className="divide-y divide-border/30 relative">
+              <AnimatePresence mode="popLayout">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="6" className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-text-muted text-sm font-medium">Refreshing list...</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : sortedStudents.length > 0 ? (
+                  sortedStudents.map((student) => (
+                    <React.Fragment key={student.id}>
+                      <motion.tr
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setExpandedRow(expandedRow === student.id ? null : student.id)}
+                        className={`transition-colors group cursor-pointer ${expandedRow === student.id ? 'bg-primary/10' : 'hover:bg-primary/5'}`}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20">
+                              {student.first_name[0]}{student.last_name[0]}
+                            </div>
+                            <div>
+                              <div className="text-sm font-bold text-secondary">{student.first_name} {student.last_name}</div>
+                              <div className="text-xs text-text-muted">{student.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-text-main">{student.student_id_number}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="flex items-center text-sm text-text-main">
+                            <GraduationCap className="w-4 h-4 mr-2 text-text-muted" />
+                            {student.cohort_name || 'Unassigned'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <StatusBadge status={student.enrollment_status} />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`text-sm font-bold ${student.overall_average >= 10 ? 'text-success' : 'text-error'}`}>
+                            {student.overall_average.toFixed(2)} / 20
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className={`text-sm font-medium ${student.total_absences > 3 ? 'text-error' : 'text-text-main'}`}>
+                            {student.total_absences}
+                          </div>
+                        </td>
+                      </motion.tr>
+
+                      {/* Fiche Détaillée Étudiant (Expandable Row) */}
+                      <AnimatePresence>
+                        {expandedRow === student.id && (
+                          <tr>
+                            <td colSpan="6" className="p-0 border-none">
+                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden bg-background/50">
+                                <div className="p-8 border-t border-border/20 grid grid-cols-1 md:grid-cols-3 gap-8">
+                                  {/* Profil & Statut de Risque */}
+                                  <div className="space-y-4 border-r border-border/50 pr-6">
+                                    <h3 className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center gap-2">
+                                      <Activity className="w-4 h-4 text-primary" /> Fiche Pédagogique
+                                    </h3>
+                                    <div className="p-4 bg-surface rounded-xl border border-border">
+                                      <p className="text-xs text-text-muted mb-1">Statut de Risque Machine Learning</p>
+                                      {student.overall_average < 10 || student.total_absences > 3 ? (
+                                        <div className="flex items-center gap-2 text-error font-bold">
+                                          <AlertCircle className="w-5 h-5" /> Étudiant à Risque
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-2 text-success font-bold">
+                                          <CheckCircle2 className="w-5 h-5" /> Profil Stable
+                                        </div>
+                                      )}
+                                      <p className="text-xs text-text-muted mt-3 mb-1">Recommandation Pédagogique</p>
+                                      <p className="text-sm font-medium text-text-main">
+                                        {student.overall_average < 10 ? "Tutorat renforcé requis sur les modules techniques." : "Maintenir le suivi actuel."}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Evolution des Notes */}
+                                  <div className="md:col-span-2 space-y-4">
+                                    <h3 className="text-sm font-bold text-secondary uppercase tracking-widest">Performances Récentes</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div className="p-4 bg-surface rounded-xl border border-border flex justify-between items-center">
+                                        <span className="text-sm font-medium text-text-muted">Moyenne Générale</span>
+                                        <span className={`text-xl font-black ${student.overall_average >= 10 ? 'text-success' : 'text-error'}`}>{student.overall_average.toFixed(2)}</span>
+                                      </div>
+                                      <div className="p-4 bg-surface rounded-xl border border-border flex justify-between items-center">
+                                        <span className="text-sm font-medium text-text-muted">Total Absences</span>
+                                        <span className={`text-xl font-black ${student.total_absences > 3 ? 'text-error' : 'text-text-main'}`}>{student.total_absences}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            </td>
+                          </tr>
+                        )}
+                      </AnimatePresence>
+                    </React.Fragment>
                   ))
                 ) : (
                   <tr>

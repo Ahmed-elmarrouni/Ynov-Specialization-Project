@@ -7,6 +7,12 @@ from pydantic import BaseModel
 from app.core.database import get_db
 from app.models.academic import Module, CohortModule, Evaluation, Grade, Cohort
 
+
+import pandas as pd
+
+
+
+
 router = APIRouter()
 
 
@@ -30,6 +36,15 @@ class CohortBreakdown(BaseModel):
     average_grade: float
     pass_rate: float
 
+class AdvancedModuleStats(BaseModel):
+    mean: float
+    median: float
+    min: float
+    max: float
+    variance: float
+    std_dev: float
+    q1: float
+    q3: float
 
 @router.get("/", response_model=List[ModuleStats])
 def get_module_master_matrix(db: Session = Depends(get_db)):
@@ -148,3 +163,34 @@ def get_module_cohort_breakdown(module_id: int, db: Session = Depends(get_db)):
         ))
 
     return breakdown
+
+
+@router.get("/{module_id}/advanced-stats", response_model=AdvancedModuleStats)
+def get_advanced_module_stats(module_id: int, db: Session = Depends(get_db)):
+    """
+    Récupère toutes les notes d'un module et utilise Pandas pour calculer 
+    les statistiques descriptives avancées (Section 2.3 du cahier des charges).
+    """
+    grades_query = (
+        db.query(Grade.score)
+        .join(Evaluation, Grade.evaluation_id == Evaluation.id)
+        .join(CohortModule, Evaluation.cohort_module_id == CohortModule.id)
+        .filter(CohortModule.module_id == module_id, Grade.is_absent == False)
+        .all()
+    )
+
+    if not grades_query:
+        return AdvancedModuleStats(mean=0, median=0, min=0, max=0, variance=0, std_dev=0, q1=0, q3=0)
+
+    df = pd.DataFrame(grades_query, columns=["score"])
+
+    return AdvancedModuleStats(
+        mean=round(df["score"].mean(), 2),
+        median=round(df["score"].median(), 2),
+        min=round(df["score"].min(), 2),
+        max=round(df["score"].max(), 2),
+        variance=round(df["score"].var(), 2) if len(df) > 1 else 0.0,
+        std_dev=round(df["score"].std(), 2) if len(df) > 1 else 0.0,
+        q1=round(df["score"].quantile(0.25), 2),
+        q3=round(df["score"].quantile(0.75), 2)
+    )

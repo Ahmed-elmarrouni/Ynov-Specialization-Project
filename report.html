@@ -3,1661 +3,2171 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>EduTrack Pedagogical Report</title>
+        <title>EduTrack - Global Pedagogical Report</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; margin: 40px; background-color: #fff; }
-            h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 5px; }
-            .header-info { font-size: 14px; color: #7f8c8d; margin-bottom: 30px; font-style: italic; }
+            :root {
+                --primary: #00babc;
+                --primary-light: rgba(0, 186, 188, 0.1);
+                --secondary: #1e293b;
+                --text-main: #334155;
+                --text-muted: #64748b;
+                --bg-main: #f8fafc;
+                --error: #ef4444;
+                --warning: #f59e0b;
+                --success: #10b981;
+            }
+            body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text-main); margin: 0; padding: 40px; background-color: var(--bg-main); }
+            .report-container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
             
-            .kpi-container { display: flex; gap: 20px; margin-bottom: 40px; }
-            .kpi-card { background-color: #f8f9fa; border-left: 5px solid #3498db; border-radius: 6px; padding: 20px; flex: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-            .kpi-value { font-size: 32px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
-            .kpi-label { font-size: 13px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+            /* Header */
+            .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
+            .header-titles h1 { color: var(--secondary); margin: 0 0 5px 0; font-size: 28px; letter-spacing: -0.5px; }
+            .header-titles p { margin: 0; color: var(--text-muted); font-size: 14px; }
+            .header-meta { text-align: right; color: var(--text-muted); font-size: 12px; }
+            .header-meta strong { color: var(--secondary); }
+
+            /* Layout Grid */
+            .executive-summary { display: flex; gap: 30px; margin-bottom: 40px; }
             
-            h2 { color: #2c3e50; margin-top: 40px; font-size: 22px; }
+            /* KPIs */
+            .kpi-column { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+            .kpi-card { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid var(--primary); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+            .kpi-value { font-size: 28px; font-weight: 800; color: var(--secondary); margin-bottom: 4px; }
+            .kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
             
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-            th, td { padding: 14px 15px; text-align: left; border-bottom: 1px solid #eaeaea; }
-            th { background-color: #2c3e50; color: white; font-weight: 500; text-transform: uppercase; font-size: 14px; letter-spacing: 0.5px; }
-            tr:hover { background-color: #f5f9fc; }
-            tr:nth-child(even) { background-color: #fafafa; }
+            /* Chart */
+            .chart-column { flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+            .chart-title { font-size: 14px; font-weight: 600; color: var(--secondary); margin-bottom: 10px; width: 100%; text-align: left; }
+            .chart-container { position: relative; height: 200px; width: 100%; }
+
+            /* Tables */
+            h2 { color: var(--secondary); margin: 0 0 15px 0; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+            th, td { padding: 16px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+            th { background-color: var(--bg-main); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+            tr:last-child td { border-bottom: none; }
             
-            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #95a5a6; border-top: 1px solid #eaeaea; padding-top: 20px; }
+            /* Badges & Utilities */
+            .badge { padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+            .badge-critical { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2); }
+            .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+            .badge-info { background: rgba(0, 186, 188, 0.1); color: var(--primary); border: 1px solid rgba(0, 186, 188, 0.2); }
+            .text-error { color: var(--error); }
+            .font-bold { font-weight: bold; }
+            
+            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: var(--text-muted); border-top: 1px solid #e2e8f0; padding-top: 20px; }
+
+            /* Print Optimizations */
+            @media print {
+                body { background-color: #fff; padding: 0; }
+                .report-container { box-shadow: none; padding: 0; max-width: 100%; }
+                .kpi-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
         </style>
     </head>
     <body>
-        <h1>EduTrack Pedagogical Report</h1>
-        <div class="header-info">Generated by Manager User on June 08, 2026 at
-            12:31:03</div>
+        <div class="report-container">
+            <div class="header">
+                <div class="header-titles">
+                    <h1>Global Pedagogical Report</h1>
+                    <p>EduTrack Analytics Enterprise</p>
+                </div>
+                <div class="header-meta">
+                    Generated on <strong>June 12, 2026 at 17:53</strong><br>
+                    Prepared by <strong>Manager User
+                        (PEDAGOGICAL_MANAGER)</strong>
+                </div>
+            </div>
 
-        <div class="kpi-container">
-            <div class="kpi-card">
-                <div class="kpi-value">1000</div>
-                <div class="kpi-label">Total Students</div>
+            <div class="executive-summary">
+                <div class="kpi-column">
+                    <div class="kpi-card">
+                        <div class="kpi-value">1010</div>
+                        <div class="kpi-label">Total Enrolled Students</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">12.09 <span
+                                style="font-size:16px; color:#64748b;">/
+                                20</span></div>
+                        <div class="kpi-label">School-Wide Average</div>
+                    </div>
+                </div>
+                <div class="chart-column">
+                    <div class="chart-title">Cohort Health Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="healthChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-value">12.1 / 20</div>
-                <div class="kpi-label">Overall Average</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value">77.2%</div>
-                <div class="kpi-label">Global Pass Rate</div>
+
+            <h2>Students Requiring Pedagogical Intervention</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Profile</th>
+                        <th>Avg Grade</th>
+                        <th>Absences</th>
+                        <th>Actionable Recommendation</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>Laure Lacombe</strong></td>
+                        <td class="text-error font-bold">8.93 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Théodore Delannoy</strong></td>
+                        <td class="text-error font-bold">9.17 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Nicolas Loiseau</strong></td>
+                        <td class="text-error font-bold">9.63 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laurent Pruvost</strong></td>
+                        <td class="text-error font-bold">8.75 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Catherine Perez</strong></td>
+                        <td class="text-error font-bold">9.55 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Nicolas François</strong></td>
+                        <td class="text-error font-bold">9.15 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marie Le Gall</strong></td>
+                        <td class="text-error font-bold">8.79 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Amélie Bousquet</strong></td>
+                        <td class="text-error font-bold">8.66 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alexandrie Rolland</strong></td>
+                        <td class="text-error font-bold">9.67 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pauline Joly</strong></td>
+                        <td class="text-error font-bold">8.0 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Rémy Rousseau</strong></td>
+                        <td class="text-error font-bold">7.68 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margaux Ramos</strong></td>
+                        <td class="text-error font-bold">9.32 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Danielle Delmas</strong></td>
+                        <td class="text-error font-bold">9.2 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Audrey Lemaître</strong></td>
+                        <td class="text-error font-bold">8.49 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Isabelle Martins</strong></td>
+                        <td class="text-error font-bold">9.29 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édith Toussaint</strong></td>
+                        <td class="text-error font-bold">8.31 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Olivier Voisin</strong></td>
+                        <td class="text-error font-bold">9.23 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Jérôme Martins</strong></td>
+                        <td class="text-error font-bold">8.96 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Yves Berthelot</strong></td>
+                        <td class="text-error font-bold">9.78 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Étienne Lejeune</strong></td>
+                        <td class="text-error font-bold">9.57 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Suzanne Petitjean</strong></td>
+                        <td class="text-error font-bold">8.68 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Constance Lévy</strong></td>
+                        <td class="text-error font-bold">9.7 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>William Fernandes</strong></td>
+                        <td class="text-error font-bold">9.08 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Adrien Blanc</strong></td>
+                        <td class="text-error font-bold">8.01 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Élisabeth Peltier</strong></td>
+                        <td class="text-error font-bold">9.11 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Guy Hamon</strong></td>
+                        <td class="text-error font-bold">9.74 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laurent Lefebvre</strong></td>
+                        <td class="text-error font-bold">8.67 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christiane Dupuis</strong></td>
+                        <td class="text-error font-bold">9.63 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Matthieu Hardy</strong></td>
+                        <td class="text-error font-bold">9.14 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sophie Germain</strong></td>
+                        <td class="text-error font-bold">8.03 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Andrée Humbert</strong></td>
+                        <td class="text-error font-bold">8.91 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Clémence Jourdan</strong></td>
+                        <td class="text-error font-bold">8.76 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Claudine Blondel</strong></td>
+                        <td class="text-error font-bold">8.66 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Augustin Arnaud</strong></td>
+                        <td class="text-error font-bold">9.77 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marcelle Pages</strong></td>
+                        <td class="text-error font-bold">7.91 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margot Colas</strong></td>
+                        <td class="text-error font-bold">9.27 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Julie Da Silva</strong></td>
+                        <td class="text-error font-bold">9.94 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Étienne Maurice</strong></td>
+                        <td class="text-error font-bold">9.53 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Denis Lévy</strong></td>
+                        <td class="text-error font-bold">8.32 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Lucas Hamel</strong></td>
+                        <td class="text-error font-bold">9.84 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Lucie Normand</strong></td>
+                        <td class="text-error font-bold">9.93 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alexandrie Normand</strong></td>
+                        <td class="text-error font-bold">9.5 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Monique Pascal</strong></td>
+                        <td class="text-error font-bold">8.19 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Auguste Cohen</strong></td>
+                        <td class="text-error font-bold">8.78 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Franck Laine</strong></td>
+                        <td class="text-error font-bold">7.59 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pauline Girard</strong></td>
+                        <td class="text-error font-bold">7.75 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Arnaude Lacroix</strong></td>
+                        <td class="text-error font-bold">8.97 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Hugues Chevalier</strong></td>
+                        <td class="text-error font-bold">8.1 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laurence Baron</strong></td>
+                        <td class="text-error font-bold">9.14 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christine Meunier</strong></td>
+                        <td class="text-error font-bold">9.57 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Hugues Bruneau</strong></td>
+                        <td class="text-error font-bold">8.75 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Auguste Delahaye</strong></td>
+                        <td class="text-error font-bold">8.02 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marcelle Fabre</strong></td>
+                        <td class="text-error font-bold">8.31 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marc Techer</strong></td>
+                        <td class="text-error font-bold">9.81 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Valentine Benoit</strong></td>
+                        <td class="text-error font-bold">9.21 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Nath Regnier</strong></td>
+                        <td class="text-error font-bold">8.56 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laurent Gonzalez</strong></td>
+                        <td class="text-error font-bold">9.55 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Maryse Maillard</strong></td>
+                        <td class="text-error font-bold">8.39 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Richard Menard</strong></td>
+                        <td class="text-error font-bold">8.82 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Anne Letellier</strong></td>
+                        <td class="text-error font-bold">8.26 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Étienne Roux</strong></td>
+                        <td class="text-error font-bold">8.56 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margaret Hernandez</strong></td>
+                        <td class="text-error font-bold">8.18 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Monique Berger</strong></td>
+                        <td class="text-error font-bold">9.3 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Benjamin Fernandes</strong></td>
+                        <td class="text-error font-bold">8.2 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Maryse Barbe</strong></td>
+                        <td class="text-error font-bold">9.29 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Josette Coulon</strong></td>
+                        <td class="text-error font-bold">9.19 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Susan Legendre</strong></td>
+                        <td class="text-error font-bold">9.37 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Charles Rossi</strong></td>
+                        <td class="text-error font-bold">8.06 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margot Guérin</strong></td>
+                        <td class="text-error font-bold">9.03 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sébastien Meyer</strong></td>
+                        <td class="text-error font-bold">9.09 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sylvie Charrier</strong></td>
+                        <td class="text-error font-bold">8.25 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Clémence Germain</strong></td>
+                        <td class="text-error font-bold">9.87 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christophe Colin</strong></td>
+                        <td class>15.44 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Constance Renault</strong></td>
+                        <td class="text-error font-bold">8.08 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Olivier Hernandez</strong></td>
+                        <td class="text-error font-bold">7.66 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margot Lelièvre</strong></td>
+                        <td class="text-error font-bold">8.56 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>David Launay</strong></td>
+                        <td class="text-error font-bold">9.36 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Olivie Philippe</strong></td>
+                        <td class="text-error font-bold">8.6 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laure Picard</strong></td>
+                        <td class="text-error font-bold">8.96 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Louise Vallée</strong></td>
+                        <td class="text-error font-bold">8.65 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Joséphine Gay</strong></td>
+                        <td class="text-error font-bold">9.74 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alain De Sousa</strong></td>
+                        <td class="text-error font-bold">9.59 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Zacharie Lecoq</strong></td>
+                        <td class="text-error font-bold">8.82 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Michelle Charrier</strong></td>
+                        <td class="text-error font-bold">9.07 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Charlotte Didier</strong></td>
+                        <td class="text-error font-bold">9.98 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Benjamin Rivière</strong></td>
+                        <td class>13.72 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Valentine Moreno</strong></td>
+                        <td class="text-error font-bold">9.61 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Rémy Pereira</strong></td>
+                        <td class="text-error font-bold">9.89 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alice Grenier</strong></td>
+                        <td class="text-error font-bold">8.5 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Suzanne Lebon</strong></td>
+                        <td class="text-error font-bold">9.03 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pauline De Sousa</strong></td>
+                        <td class="text-error font-bold">8.81 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Claudine Rey</strong></td>
+                        <td class="text-error font-bold">9.73 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Paulette Renard</strong></td>
+                        <td class="text-error font-bold">8.44 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édith Duval</strong></td>
+                        <td class="text-error font-bold">9.67 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Corinne Gérard</strong></td>
+                        <td class="text-error font-bold">8.27 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Frédérique Delaunay</strong></td>
+                        <td class="text-error font-bold">9.01 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sabine Fernandes</strong></td>
+                        <td class="text-error font-bold">7.4 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Maryse Picard</strong></td>
+                        <td class="text-error font-bold">8.16 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Julien Hoareau</strong></td>
+                        <td class="text-error font-bold">8.53 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Joséphine Robert</strong></td>
+                        <td class="text-error font-bold">9.37 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sabine Gaillard</strong></td>
+                        <td class="text-error font-bold">9.18 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christophe Loiseau</strong></td>
+                        <td class="text-error font-bold">9.7 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Corinne Bousquet</strong></td>
+                        <td class="text-error font-bold">7.82 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sébastien Leclercq</strong></td>
+                        <td class="text-error font-bold">8.22 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marc Salmon</strong></td>
+                        <td class>13.0 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Audrey Langlois</strong></td>
+                        <td class="text-error font-bold">9.92 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Simone Durand</strong></td>
+                        <td class>14.95 / 20</td>
+                        <td class="text-error font-bold">5</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marcelle Teixeira</strong></td>
+                        <td class="text-error font-bold">9.42 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Océane Andre</strong></td>
+                        <td class="text-error font-bold">8.23 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Isabelle Torres</strong></td>
+                        <td class="text-error font-bold">8.23 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sébastien Payet</strong></td>
+                        <td class="text-error font-bold">9.27 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Roland Colin</strong></td>
+                        <td class="text-error font-bold">9.24 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Augustin Da Silva</strong></td>
+                        <td class="text-error font-bold">9.45 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>René Lucas</strong></td>
+                        <td class="text-error font-bold">8.27 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Charles Chrétien</strong></td>
+                        <td class="text-error font-bold">9.06 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Tristan Lemoine</strong></td>
+                        <td class="text-error font-bold">10.0 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Léon Perez</strong></td>
+                        <td class="text-error font-bold">7.75 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Aurélie Petitjean</strong></td>
+                        <td class="text-error font-bold">7.99 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Xavier Besnard</strong></td>
+                        <td class="text-error font-bold">7.4 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Guillaume Bouvet</strong></td>
+                        <td class="text-error font-bold">9.63 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gabriel Martineau</strong></td>
+                        <td class="text-error font-bold">9.55 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alain Michel</strong></td>
+                        <td class>10.69 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Xavier Merle</strong></td>
+                        <td class="text-error font-bold">7.11 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Thérèse Letellier</strong></td>
+                        <td class="text-error font-bold">8.75 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Élise Maillard</strong></td>
+                        <td class="text-error font-bold">7.43 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>François Coulon</strong></td>
+                        <td class="text-error font-bold">8.71 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Thérèse Lebrun</strong></td>
+                        <td class="text-error font-bold">9.2 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édouard Garcia</strong></td>
+                        <td class="text-error font-bold">9.64 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sébastien Dufour</strong></td>
+                        <td class="text-error font-bold">8.47 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Lorraine Dupont</strong></td>
+                        <td class="text-error font-bold">7.97 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Charlotte Buisson</strong></td>
+                        <td class="text-error font-bold">8.67 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Henriette Samson</strong></td>
+                        <td class="text-error font-bold">8.63 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pénélope Perez</strong></td>
+                        <td class="text-error font-bold">9.56 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Frédérique Léger</strong></td>
+                        <td class="text-error font-bold">9.74 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laetitia Rocher</strong></td>
+                        <td class="text-error font-bold">8.39 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Juliette Pottier</strong></td>
+                        <td class="text-error font-bold">9.04 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christine Leleu</strong></td>
+                        <td class>14.15 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alix Marchal</strong></td>
+                        <td class="text-error font-bold">9.27 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Jean Renaud</strong></td>
+                        <td class="text-error font-bold">9.02 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Maggie Lecomte</strong></td>
+                        <td class="text-error font-bold">8.94 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>René Gautier</strong></td>
+                        <td class="text-error font-bold">8.14 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Yves Rivière</strong></td>
+                        <td class="text-error font-bold">9.36 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Benoît Gimenez</strong></td>
+                        <td class="text-error font-bold">8.47 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gilbert Barre</strong></td>
+                        <td class="text-error font-bold">9.34 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Bernadette Lacroix</strong></td>
+                        <td class="text-error font-bold">9.76 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Julien Rolland</strong></td>
+                        <td class="text-error font-bold">8.89 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christine Humbert</strong></td>
+                        <td class="text-error font-bold">8.93 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Rémy Duval</strong></td>
+                        <td class="text-error font-bold">9.56 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Isabelle Picard</strong></td>
+                        <td class="text-error font-bold">9.85 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gabrielle Barthelemy</strong></td>
+                        <td class="text-error font-bold">9.68 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édouard Labbé</strong></td>
+                        <td class="text-error font-bold">9.72 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Anastasie Martinez</strong></td>
+                        <td class="text-error font-bold">8.86 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Louise Da Costa</strong></td>
+                        <td class="text-error font-bold">8.8 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Benoît Rossi</strong></td>
+                        <td class="text-error font-bold">9.62 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-critical'>Urgent Meeting &
+                                Probation</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Benoît Rodriguez</strong></td>
+                        <td class="text-error font-bold">9.48 / 20</td>
+                        <td class="text-error font-bold">5</td>
+                        <td><span class='badge badge-critical'>Urgent Meeting &
+                                Probation</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Théodore Costa</strong></td>
+                        <td class="text-error font-bold">9.41 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Simone Bourgeois</strong></td>
+                        <td class="text-error font-bold">8.66 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Capucine Adam</strong></td>
+                        <td class="text-error font-bold">9.49 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Éléonore Michaud</strong></td>
+                        <td class>14.83 / 20</td>
+                        <td class="text-error font-bold">5</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Sabine Pons</strong></td>
+                        <td class="text-error font-bold">7.33 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Victor Julien</strong></td>
+                        <td class="text-error font-bold">9.89 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Thierry Gimenez</strong></td>
+                        <td class="text-error font-bold">8.2 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gabrielle Lagarde</strong></td>
+                        <td class="text-error font-bold">8.71 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margot Toussaint</strong></td>
+                        <td class="text-error font-bold">9.61 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Joséphine Marion</strong></td>
+                        <td class="text-error font-bold">9.15 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marc Joubert</strong></td>
+                        <td class="text-error font-bold">8.55 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Olivier Hamon</strong></td>
+                        <td class="text-error font-bold">8.8 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gérard Lagarde</strong></td>
+                        <td class="text-error font-bold">9.62 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pauline Foucher</strong></td>
+                        <td class="text-error font-bold">7.1 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Éléonore Labbé</strong></td>
+                        <td class="text-error font-bold">7.36 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Aurélie Mahe</strong></td>
+                        <td class="text-error font-bold">9.96 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Xavier Delaunay</strong></td>
+                        <td class="text-error font-bold">7.5 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édith Ollivier</strong></td>
+                        <td class="text-error font-bold">9.69 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Vincent Dumont</strong></td>
+                        <td class="text-error font-bold">9.06 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laure Gérard</strong></td>
+                        <td class="text-error font-bold">7.95 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laurent Ferreira</strong></td>
+                        <td class="text-error font-bold">8.34 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Claudine Étienne</strong></td>
+                        <td class="text-error font-bold">9.22 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édouard Martin</strong></td>
+                        <td class="text-error font-bold">8.91 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-critical'>Urgent Meeting &
+                                Probation</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Emmanuelle Ruiz</strong></td>
+                        <td class="text-error font-bold">9.03 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alain Leleu</strong></td>
+                        <td class="text-error font-bold">8.33 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Nathalie Blin</strong></td>
+                        <td class="text-error font-bold">8.3 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Luc Hernandez</strong></td>
+                        <td class="text-error font-bold">9.55 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Timothée Lelièvre</strong></td>
+                        <td class="text-error font-bold">6.84 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Maggie Bousquet</strong></td>
+                        <td class="text-error font-bold">8.74 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Frédéric Gay</strong></td>
+                        <td class="text-error font-bold">9.43 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Rémy Laroche</strong></td>
+                        <td class="text-error font-bold">9.01 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Michel Pereira</strong></td>
+                        <td class="text-error font-bold">9.4 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Nathalie Gaudin</strong></td>
+                        <td class>14.27 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Frédérique Hervé</strong></td>
+                        <td class="text-error font-bold">9.87 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Renée Lamy</strong></td>
+                        <td class="text-error font-bold">9.76 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Émile Dupont</strong></td>
+                        <td class="text-error font-bold">9.73 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Camille Legros</strong></td>
+                        <td class="text-error font-bold">9.42 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Henri Sanchez</strong></td>
+                        <td class="text-error font-bold">9.85 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alexandrie Hervé</strong></td>
+                        <td class="text-error font-bold">8.64 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Audrey Aubry</strong></td>
+                        <td class="text-error font-bold">9.05 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Édith Dumont</strong></td>
+                        <td class="text-error font-bold">9.71 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Emmanuel Dos Santos</strong></td>
+                        <td class="text-error font-bold">9.17 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Michel Alexandre</strong></td>
+                        <td class="text-error font-bold">8.95 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Laurence Dubois</strong></td>
+                        <td class="text-error font-bold">9.96 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Margaux Gimenez</strong></td>
+                        <td class="text-error font-bold">9.36 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Anouk Hardy</strong></td>
+                        <td class="text-error font-bold">8.48 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Michelle Diallo</strong></td>
+                        <td class="text-error font-bold">9.59 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Henri Perez</strong></td>
+                        <td class="text-error font-bold">8.3 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gilbert Lemoine</strong></td>
+                        <td class="text-error font-bold">8.09 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Michelle Berger</strong></td>
+                        <td class="text-error font-bold">9.52 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Astrid Ferrand</strong></td>
+                        <td class="text-error font-bold">9.25 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Caroline Fournier</strong></td>
+                        <td class="text-error font-bold">8.09 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gilbert Perrot</strong></td>
+                        <td class="text-error font-bold">9.46 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Henriette Guérin</strong></td>
+                        <td class="text-error font-bold">9.51 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christiane Hoarau</strong></td>
+                        <td class="text-error font-bold">8.98 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Hugues Perez</strong></td>
+                        <td class="text-error font-bold">9.06 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Guillaume Bruneau</strong></td>
+                        <td class="text-error font-bold">9.25 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Corinne De Oliveira</strong></td>
+                        <td class="text-error font-bold">9.11 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Guy Imbert</strong></td>
+                        <td class="text-error font-bold">9.14 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marcelle Hamon</strong></td>
+                        <td class="text-error font-bold">7.91 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Marcelle Delattre</strong></td>
+                        <td class="text-error font-bold">9.41 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>André Weber</strong></td>
+                        <td class="text-error font-bold">8.6 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Audrey Goncalves</strong></td>
+                        <td class="text-error font-bold">9.65 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Anaïs Camus</strong></td>
+                        <td class="text-error font-bold">9.98 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Colette Foucher</strong></td>
+                        <td class="text-error font-bold">9.12 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Martine Grenier</strong></td>
+                        <td class="text-error font-bold">9.97 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Adrien Marion</strong></td>
+                        <td class="text-error font-bold">8.09 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Arnaude Carlier</strong></td>
+                        <td class="text-error font-bold">9.07 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Véronique Maillet</strong></td>
+                        <td class="text-error font-bold">9.48 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Charlotte Berthelot</strong></td>
+                        <td class="text-error font-bold">8.91 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Hélène Martin</strong></td>
+                        <td class="text-error font-bold">9.41 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Martine Pelletier</strong></td>
+                        <td class="text-error font-bold">9.7 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Thierry Morel</strong></td>
+                        <td class="text-error font-bold">9.69 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Yves Lenoir</strong></td>
+                        <td class="text-error font-bold">9.82 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Éléonore Georges</strong></td>
+                        <td class="text-error font-bold">8.73 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Joseph Carlier</strong></td>
+                        <td class="text-error font-bold">9.75 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pierre Lemoine</strong></td>
+                        <td class="text-error font-bold">8.34 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christophe Gilbert</strong></td>
+                        <td class="text-error font-bold">9.7 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Michelle De Sousa</strong></td>
+                        <td class="text-error font-bold">8.82 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Émilie Weber</strong></td>
+                        <td class="text-error font-bold">8.99 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alexandria Toussaint</strong></td>
+                        <td class="text-error font-bold">7.26 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Thierry Courtois</strong></td>
+                        <td class="text-error font-bold">10.0 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Benoît Paul</strong></td>
+                        <td class>10.14 / 20</td>
+                        <td class="text-error font-bold">4</td>
+                        <td><span class='badge badge-info'>Send Attendance
+                                Warning</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Gabrielle Boyer</strong></td>
+                        <td class="text-error font-bold">7.99 / 20</td>
+                        <td class="text-error font-bold">5</td>
+                        <td><span class='badge badge-critical'>Urgent Meeting &
+                                Probation</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Eugène Courtois</strong></td>
+                        <td class="text-error font-bold">8.57 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Alain Aubry</strong></td>
+                        <td class="text-error font-bold">8.43 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Pierre Rousset</strong></td>
+                        <td class="text-error font-bold">9.11 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Renée Barthelemy</strong></td>
+                        <td class="text-error font-bold">9.7 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>William Pelletier</strong></td>
+                        <td class="text-error font-bold">9.59 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Thierry Roux</strong></td>
+                        <td class="text-error font-bold">7.57 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Agnès Voisin</strong></td>
+                        <td class="text-error font-bold">9.25 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Franck Payet</strong></td>
+                        <td class="text-error font-bold">9.37 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Audrey Lamy</strong></td>
+                        <td class="text-error font-bold">8.09 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Amélie Bonneau</strong></td>
+                        <td class="text-error font-bold">8.04 / 20</td>
+                        <td class>0</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Olivier Lelièvre</strong></td>
+                        <td class="text-error font-bold">8.97 / 20</td>
+                        <td class>3</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Antoine Carre</strong></td>
+                        <td class="text-error font-bold">9.25 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Christiane Lamy</strong></td>
+                        <td class="text-error font-bold">9.64 / 20</td>
+                        <td class>1</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Colette Valette</strong></td>
+                        <td class="text-error font-bold">7.63 / 20</td>
+                        <td class>2</td>
+                        <td><span class='badge badge-warning'>Peer-tutoring
+                                Recommended</span></td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <div class="footer">
+                EduTrack Analytics Platform • Confidential & Internal Use Only
             </div>
         </div>
 
-        <h2>Students Requiring Pedagogical Intervention</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Average Grade</th>
-                    <th>Total Absences</th>
-                    <th>Actionable Recommendation</th>
-                </tr>
-            </thead>
-            <tbody>
-
-                <tr>
-                    <td>Cécile Rocher</td>
-                    <td>9.1</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>David Guillet</td>
-                    <td>8.49</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Pauline Caron</td>
-                    <td>7.88</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Nicolas Rémy</td>
-                    <td>8.89</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Sébastien Ribeiro</td>
-                    <td>9.01</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Frédéric Guillet</td>
-                    <td>8.13</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Amélie Klein</td>
-                    <td>9.2</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Renée Costa</td>
-                    <td>8.44</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Jules Hoareau</td>
-                    <td>9.44</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Claudine Masse</td>
-                    <td>8.7</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bertrand Chauvin</td>
-                    <td>9.46</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Timothée Camus</td>
-                    <td>8.75</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alphonse Nicolas</td>
-                    <td>6.97</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Zoé Roux</td>
-                    <td>9.13</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Jean Gay</td>
-                    <td>9.86</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gérard Hernandez</td>
-                    <td>8.41</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Adrienne Meunier</td>
-                    <td>9.74</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Sophie Marques</td>
-                    <td>8.5</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Inès Perrin</td>
-                    <td>9.22</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Guillaume Lejeune</td>
-                    <td>7.21</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Édouard Lefebvre</td>
-                    <td>8.71</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bernadette Pineau</td>
-                    <td>9.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Christine Petitjean</td>
-                    <td>9.7</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Paul Moreau</td>
-                    <td>9.86</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Denis Rey</td>
-                    <td>9.11</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Raymond Rey</td>
-                    <td>8.88</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Thibault Vincent</td>
-                    <td>7.7</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Raymond Guilbert</td>
-                    <td>7.83</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Hugues Roux</td>
-                    <td>8.74</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Raymond Barthelemy</td>
-                    <td>8.23</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gérard Jacques</td>
-                    <td>8.78</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Agnès Léger</td>
-                    <td>8.07</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Guy Legrand</td>
-                    <td>9.45</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bertrand Roche</td>
-                    <td>9.41</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Léon Blot</td>
-                    <td>8.91</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Zoé Martinez</td>
-                    <td>8.76</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michelle Maillard</td>
-                    <td>7.67</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Claudine Chauveau</td>
-                    <td>8.83</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Josette Barthelemy</td>
-                    <td>9.81</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Élodie Humbert</td>
-                    <td>7.85</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Stéphanie Paris</td>
-                    <td>8.36</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gérard Jean</td>
-                    <td>8.64</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Claude Rousset</td>
-                    <td>9.28</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Christine Robin</td>
-                    <td>9.41</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Anaïs Merle</td>
-                    <td>9.13</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michelle Foucher</td>
-                    <td>8.14</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Adrienne Gautier</td>
-                    <td>7.98</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Laurent Perrot</td>
-                    <td>8.58</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alphonse Vallet</td>
-                    <td>8.15</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Capucine Da Silva</td>
-                    <td>9.27</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Antoinette Morel</td>
-                    <td>8.7</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Constance Robin</td>
-                    <td>9.76</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Eugène Tanguy</td>
-                    <td>8.73</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Sabine Fournier</td>
-                    <td>8.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Martin Vincent</td>
-                    <td>9.62</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Thierry Morin</td>
-                    <td>9.39</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Hortense Traore</td>
-                    <td>9.99</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Brigitte Schmitt</td>
-                    <td>8.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Monique Langlois</td>
-                    <td>8.11</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Margaux Royer</td>
-                    <td>9.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Louise Jacques</td>
-                    <td>8.95</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Emmanuel Guillot</td>
-                    <td>9.23</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Louise Noël</td>
-                    <td>8.83</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alix Dos Santos</td>
-                    <td>8.57</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Antoine Lefort</td>
-                    <td>9.16</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Simone Dupuy</td>
-                    <td>9.36</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Emmanuelle Delaunay</td>
-                    <td>9.48</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Roland Dos Santos</td>
-                    <td>9.32</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michelle Torres</td>
-                    <td>8.51</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Hugues Roux</td>
-                    <td>8.26</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Isaac Pineau</td>
-                    <td>9.34</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Eugène Sauvage</td>
-                    <td>8.28</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Arthur Rocher</td>
-                    <td>7.95</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Nicolas Carre</td>
-                    <td>8.98</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Martine Munoz</td>
-                    <td>9.73</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Adélaïde Fernandes</td>
-                    <td>9.15</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Grégoire Samson</td>
-                    <td>8.68</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Céline Toussaint</td>
-                    <td>9.71</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Nicole Da Costa</td>
-                    <td>9.74</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Noémi Morin</td>
-                    <td>8.11</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Guy Brunel</td>
-                    <td>8.99</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Amélie Garnier</td>
-                    <td>9.53</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michelle Morel</td>
-                    <td>8.49</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Jeannine Bertrand</td>
-                    <td>8.89</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bertrand Chauvin</td>
-                    <td>9.1</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Léon Lenoir</td>
-                    <td>9.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Maurice Julien</td>
-                    <td>9.08</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gabrielle Seguin</td>
-                    <td>7.63</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Théophile Weiss</td>
-                    <td>7.23</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Manon Dubois</td>
-                    <td>8.38</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Laure Hamel</td>
-                    <td>9.69</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alix Aubry</td>
-                    <td>8.3</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Valérie Bernard</td>
-                    <td>9.08</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Benjamin Bernier</td>
-                    <td>8.64</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Pauline Antoine</td>
-                    <td>9.37</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Martin Pierre</td>
-                    <td>9.61</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Isaac Guillaume</td>
-                    <td>8.95</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Mathilde Garnier</td>
-                    <td>9.37</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Sylvie Riou</td>
-                    <td>9.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Marianne Gay</td>
-                    <td>8.96</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Étienne François</td>
-                    <td>8.56</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gabriel Pons</td>
-                    <td>8.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bernadette Vallet</td>
-                    <td>8.99</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alex Roger</td>
-                    <td>9.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bernadette De Oliveira</td>
-                    <td>7.65</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Aurore Fleury</td>
-                    <td>9.84</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Emmanuel Riou</td>
-                    <td>8.66</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gilbert Jacquet</td>
-                    <td>8.67</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Franck Dumas</td>
-                    <td>8.26</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Margot Da Costa</td>
-                    <td>9.84</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Inès Blanc</td>
-                    <td>8.8</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Roger Hervé</td>
-                    <td>8.8</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Matthieu Imbert</td>
-                    <td>7.46</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Roland Bernard</td>
-                    <td>9.27</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Amélie Briand</td>
-                    <td>7.77</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Matthieu Berthelot</td>
-                    <td>8.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Lucas Henry</td>
-                    <td>9.87</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alexandrie Caron</td>
-                    <td>9.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Josette Jacquot</td>
-                    <td>9.65</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Thibault Gomes</td>
-                    <td>8.65</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Émile Guyot</td>
-                    <td>9.89</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Danielle Bazin</td>
-                    <td>9.74</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Pénélope Dijoux</td>
-                    <td>8.72</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michel Torres</td>
-                    <td>8.58</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Maurice De Oliveira</td>
-                    <td>7.65</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Margaud Munoz</td>
-                    <td>9.8</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Hugues Fouquet</td>
-                    <td>9.18</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Manon Turpin</td>
-                    <td>9.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Audrey Léger</td>
-                    <td>8.48</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Pénélope Le Gall</td>
-                    <td>8.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Charlotte Étienne</td>
-                    <td>8.26</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alex Salmon</td>
-                    <td>9.94</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Laurent Lebon</td>
-                    <td>8.85</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Diane Fischer</td>
-                    <td>9.15</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Philippine Legros</td>
-                    <td>9.75</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Christiane Laine</td>
-                    <td>9.65</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Richard Benard</td>
-                    <td>7.68</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alain Poulain</td>
-                    <td>9.37</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Marie Clerc</td>
-                    <td>8.28</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Suzanne Adam</td>
-                    <td>9.82</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Monique Bourgeois</td>
-                    <td>9.12</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Hugues Dumont</td>
-                    <td>8.19</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Aimé Renard</td>
-                    <td>8.51</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Célina Dubois</td>
-                    <td>8.22</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Denise Leroy</td>
-                    <td>9.95</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Aurore Loiseau</td>
-                    <td>8.15</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Manon Mathieu</td>
-                    <td>9.01</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Nicolas Becker</td>
-                    <td>8.74</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michelle Munoz</td>
-                    <td>8.17</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Marie Gonzalez</td>
-                    <td>8.05</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Richard Leblanc</td>
-                    <td>9.06</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Anne Paul</td>
-                    <td>8.26</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Madeleine Maillard</td>
-                    <td>8.21</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Eugène Gérard</td>
-                    <td>9.41</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Bernard Pires</td>
-                    <td>9.72</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Astrid Delattre</td>
-                    <td>8.56</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Margaud Carpentier</td>
-                    <td>9.75</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Eugène Lenoir</td>
-                    <td>9.47</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Maurice Dupuis</td>
-                    <td>7.88</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Noémi Pasquier</td>
-                    <td>8.52</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Margot Charles</td>
-                    <td>9.62</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Xavier Le Goff</td>
-                    <td>7.96</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Margot Wagner</td>
-                    <td>9.58</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Léon Barthelemy</td>
-                    <td>9.86</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Capucine Legrand</td>
-                    <td>9.48</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Lucie Delahaye</td>
-                    <td>9.96</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Laure Weber</td>
-                    <td>8.93</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Dorothée Diaz</td>
-                    <td>8.88</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michèle Hardy</td>
-                    <td>9.95</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Lucas Lagarde</td>
-                    <td>7.48</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Virginie Philippe</td>
-                    <td>9.07</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Antoinette Guillaume</td>
-                    <td>8.35</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Brigitte Barre</td>
-                    <td>8.14</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Arthur Lebreton</td>
-                    <td>8.79</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Patrick Wagner</td>
-                    <td>8.59</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Louise Guillot</td>
-                    <td>9.24</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Maurice Jacquet</td>
-                    <td>7.12</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gabrielle Lemonnier</td>
-                    <td>8.72</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Anouk Hervé</td>
-                    <td>8.67</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Luc Fabre</td>
-                    <td>9.44</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Sophie Bodin</td>
-                    <td>7.86</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Mathilde Allain</td>
-                    <td>8.92</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Charles Marin</td>
-                    <td>7.31</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Chantal Verdier</td>
-                    <td>8.14</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Joseph Payet</td>
-                    <td>8.52</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Denis Letellier</td>
-                    <td>9.72</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Guillaume Vasseur</td>
-                    <td>9.58</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Diane Ferrand</td>
-                    <td>9.73</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Pierre Martins</td>
-                    <td>8.99</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Inès Vaillant</td>
-                    <td>8.44</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Stéphanie Leroux</td>
-                    <td>9.89</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Robert Marin</td>
-                    <td>9.53</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Édith Verdier</td>
-                    <td>8.8</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Étienne Leroy</td>
-                    <td>9.63</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Lucy Morvan</td>
-                    <td>8.47</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Frédéric Da Silva</td>
-                    <td>8.67</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Éléonore Morvan</td>
-                    <td>8.83</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Gabriel Prévost</td>
-                    <td>9.38</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alain Mercier</td>
-                    <td>8.39</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Nathalie Lacroix</td>
-                    <td>9.57</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Marthe Durand</td>
-                    <td>9.77</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Léon Pereira</td>
-                    <td>8.29</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Christophe Salmon</td>
-                    <td>8.61</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Tristan De Sousa</td>
-                    <td>9.62</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Claude Hervé</td>
-                    <td>7.91</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Isaac Benard</td>
-                    <td>8.69</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Guillaume Pires</td>
-                    <td>8.37</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Diane Fischer</td>
-                    <td>9.54</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Alexandrie Godard</td>
-                    <td>9.04</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Emmanuel Munoz</td>
-                    <td>7.33</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Thibaut Samson</td>
-                    <td>9.22</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Zacharie Pons</td>
-                    <td>9.22</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Sylvie Hernandez</td>
-                    <td>9.17</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Michelle Guérin</td>
-                    <td>9.5</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Lorraine Pelletier</td>
-                    <td>9.53</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Laure Sanchez</td>
-                    <td>9.52</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Paulette Boulanger</td>
-                    <td>9.34</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Hélène Lelièvre</td>
-                    <td>9.75</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Raymond Collin</td>
-                    <td>7.01</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Aimée Roussel</td>
-                    <td>8.29</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Juliette Labbé</td>
-                    <td>9.34</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Charles Chevalier</td>
-                    <td>9.62</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Paul Fleury</td>
-                    <td>8.95</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Noémi Leduc</td>
-                    <td>9.04</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Danielle Marty</td>
-                    <td>9.63</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Marianne Muller</td>
-                    <td>9.42</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Eugène Lemonnier</td>
-                    <td>9.7</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-                <tr>
-                    <td>Christophe Breton</td>
-                    <td>9.39</td>
-                    <td>0</td>
-                    <td>Peer-tutoring recommended</td>
-                </tr>
-
-            </tbody>
-        </table>
-
-        <div class="footer">
-            EduTrack Analytics Platform - Automated Reporting System
-        </div>
+        <script>
+            const ctx = document.getElementById('healthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Passing (>= 10)', 'Failing (< 10)'],
+                    datasets: [{
+                        data: [756, 254],
+                        backgroundColor: ['#00babc', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11, family: "'Inter', sans-serif" } } }
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
