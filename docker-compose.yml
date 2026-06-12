@@ -15,18 +15,6 @@ services:
     networks:
       - edutrack-network
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: edutrack-frontend
-  #   ports:
-  #     - "3000:80"
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - edutrack-network
-
   frontend:
     build:
       context: ./frontend

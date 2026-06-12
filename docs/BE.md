@@ -2,6 +2,24 @@
 
 In this phase of the project, I built the database architecture for the EduTrack Analytics platform. I used Python, SQLAlchemy, Alembic, and PostgreSQL to create a scalable and secure backend system.
 
+## Technical Stack
+
+- **API Framework:** FastAPI (Asynchronous & Type-safe)
+- **ORM:** SQLAlchemy 2.0
+- **Database:** PostgreSQL
+- **Migration Tool:** Alembic
+- **Security:** PyJWT & Passlib (Bcrypt)
+
+## Project Structure
+
+The backend follows a modular design pattern to ensure maintainability:
+
+- `/api/routes/`: Contains endpoint logic grouped by feature.
+- `/core/`: Handles database connection pools and security configurations.
+- `/etl/`: The core pipeline for data cleaning and ingestion.
+- `/models/`: SQLAlchemy ORM definitions.
+- `/services/`: External integrations (e.g., Email Service).
+
 ## Steps I Completed
 
 1. **Database Creation**
@@ -64,3 +82,9 @@ Secure File Handling: To prevent malicious uploads in the data import feature, I
     Database Sequence Desync: Resolved UniqueViolation errors caused by PostgreSQL ID sequence mismatches after bulk CSV imports by updating the database sequence counter.
 
     Automated HTML Generation: Developed a reporting service that dynamically injects calculated KPIs and at-risk student lists into a professional HTML template, providing actionable data for administrators.
+
+## Technical Challenges Conquered
+
+- **Database Sequence Desync:** Resolved `UniqueViolation` errors after bulk CSV imports by manually resetting PostgreSQL ID sequences (`setval`) in the ETL pipeline.
+- **Complex Aggregation:** Optimized analytics queries to avoid Cartesian products, ensuring the dashboard loads instantly even with thousands of rows.
+- **Environment Isolation:** Used `venv` to resolve Python version conflicts on macOS and ensure dependency consistency between my local machine and the production Docker environment.
