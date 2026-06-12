@@ -1,35 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  BookOpen, Layers, AlertCircle, TrendingUp, BarChart2,
+  Layers, BarChart2,
   Activity, Search, ArrowUpDown, ChevronUp, ChevronDown, Monitor,
-  Target, Circle, Hexagon, PieChart as PieChartIcon
+  Target, PieChart as PieChartIcon, Calculator
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  Radar, BarChart, Bar, Cell, AreaChart, Area, LineChart, Line, PieChart, Pie
+  Radar, BarChart, Bar, Cell, AreaChart, Area, PieChart, Pie
 } from 'recharts';
 import moduleService from '../../services/modules';
-
-// --- 1. KPI Card Component ---
-// const StatCard = ({ title, value, icon: Icon, colorClass = "from-primary/10 to-primary/5" }) => (
-//   <div className="relative overflow-hidden bg-surface/40 backdrop-blur-xl border border-border/40 rounded-xl p-6 shadow-sm group hover:border-primary/30 transition-all duration-300">
-//     <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-300" />
-//     <div className="flex items-center justify-between gap-4">
-//       <div className="space-y-1.5">
-//         <p className="text-xs font-bold text-text-muted uppercase tracking-widest">{title}</p>
-//         <h3 className="text-3xl font-extrabold text-secondary tracking-tight group-hover:text-primary transition-colors duration-300">
-//           {value}
-//         </h3>
-//       </div>
-//       <div className={`p-3 bg-linear-to-br ${colorClass} border border-primary/10 text-primary rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-primary/5 shrink-0`}>
-//         <Icon className="w-5 h-5 stroke-[2.25]" />
-//       </div>
-//     </div>
-//   </div>
-// );
 
 // --- 2. Status Badge Component ---
 const StatusBadge = ({ average }) => {
@@ -80,7 +62,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 const CreditsCorrelationChart = ({ data }) => {
   const [chartType, setChartType] = useState('area');
 
-  // CRITICAL FIX: Force numeric casting to prevent Recharts from crashing silently
   const safeData = useMemo(() => {
     if (!Array.isArray(data)) return [];
     return data.map(d => ({
@@ -150,7 +131,6 @@ const CreditsCorrelationChart = ({ data }) => {
           </button>
         </div>
       </div>
-      {/* Explicit height prevents layout collapsing */}
       <div style={{ height: '320px', width: '100%' }}>
         <ResponsiveContainer width="100%" height="100%">{renderChart()}</ResponsiveContainer>
       </div>
@@ -163,7 +143,6 @@ const EvaluationImpactChart = ({ data }) => {
   const [chartType, setChartType] = useState('bar');
   const COLORS = ['#10b981', '#00babc', '#ef4444'];
 
-  // CRITICAL FIX: Numeric mapping
   const safeData = useMemo(() => {
     if (!Array.isArray(data)) return [];
     return data.map(d => ({
@@ -247,9 +226,16 @@ const ModulesPage = () => {
   const [evalStats, setEvalStats] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  // Drill-down States
   const [expandedRow, setExpandedRow] = useState(null);
   const [cohortData, setCohortData] = useState({});
   const [loadingCohort, setLoadingCohort] = useState(null);
+
+  // 👇 NOUVEAUX ÉTATS POUR LES STATS AVANCÉES 👇
+  const [advancedStats, setAdvancedStats] = useState({});
+  const [loadingStats, setLoadingStats] = useState(null);
+
   const [sortConfig, setSortConfig] = useState({ key: 'overall_average', direction: 'asc' });
 
   const loadData = useCallback(async () => {
@@ -271,12 +257,15 @@ const ModulesPage = () => {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  // 👇 MISE À JOUR : FETCH DES STATS AVANCÉES LORS DU CLIC 👇
   const handleRowClick = async (moduleId) => {
     if (expandedRow === moduleId) {
       setExpandedRow(null);
       return;
     }
     setExpandedRow(moduleId);
+
+    // 1. Fetch Cohort Breakdown
     if (!cohortData[moduleId]) {
       setLoadingCohort(moduleId);
       try {
@@ -284,6 +273,16 @@ const ModulesPage = () => {
         setCohortData(prev => ({ ...prev, [moduleId]: data }));
       } catch (err) { toast.error('Failed to load cohort breakdown'); }
       finally { setLoadingCohort(null); }
+    }
+
+    // 2. Fetch Advanced Stats (Médiane, Variance, etc.)
+    if (!advancedStats[moduleId]) {
+      setLoadingStats(moduleId);
+      try {
+        const statsData = await moduleService.getAdvancedStats(moduleId);
+        setAdvancedStats(prev => ({ ...prev, [moduleId]: statsData }));
+      } catch (err) { toast.error('Failed to load advanced statistics'); }
+      finally { setLoadingStats(null); }
     }
   };
 
@@ -309,10 +308,6 @@ const ModulesPage = () => {
     setSortConfig({ key, direction });
   };
 
-  const activeModulesCount = modules.length;
-  const schoolWideAvg = modules.length > 0 ? (modules.reduce((acc, m) => acc + m.overall_average, 0) / modules.length).toFixed(2) : 0;
-  const criticalModulesCount = modules.filter(m => m.overall_average < 10).length;
-
   const SortableHeader = ({ label, sortKey }) => (
     <th className="px-6 py-4 cursor-pointer hover:bg-background/50 transition-colors group select-none" onClick={() => handleSort(sortKey)}>
       <div className="flex items-center gap-2">
@@ -333,20 +328,11 @@ const ModulesPage = () => {
         <p className="text-text-muted mt-1">Cross-cohort difficulty analysis and evaluation metrics.</p>
       </div>
 
-      {/* KPI Section */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Active Modules" value={activeModulesCount} icon={BookOpen} />
-        <StatCard title="Global Module Avg" value={`${schoolWideAvg}/20`} icon={Activity} />
-        <StatCard title="Critical Modules" value={criticalModulesCount} icon={AlertCircle} colorClass={criticalModulesCount > 0 ? "from-error/20 to-error/5 text-error" : "from-success/20 to-success/5 text-success"} />
-      </div> */}
-
-      {/* Advanced Shape-Shifting Recharts Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <CreditsCorrelationChart data={modules} />
         <EvaluationImpactChart data={evalStats} />
       </div>
 
-      {/* Data Table Section */}
       <div className="bg-surface/50 backdrop-blur-md border border-border/50 rounded-2xl overflow-hidden shadow-sm">
         <div className="p-6 border-b border-border/50 flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="relative w-full sm:w-96">
@@ -355,7 +341,7 @@ const ModulesPage = () => {
           </div>
           <div className="flex items-center gap-2 text-text-muted text-sm font-medium">
             <Target className="w-4 h-4" />
-            <span>Click any row to view cohort breakdown</span>
+            <span>Click any row to view cohort breakdown and statistics</span>
           </div>
         </div>
 
@@ -411,11 +397,15 @@ const ModulesPage = () => {
                           <td colSpan="7" className="p-0 border-none">
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden bg-background/30">
                               <div className="p-8 border-t border-border/20">
-                                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center gap-2 mb-6"><Monitor className="w-4 h-4" /> Cohort Breakdown for {module.name}</h3>
+
+                                {/* 1. Cohort Chart Section */}
+                                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center gap-2 mb-6">
+                                  <Monitor className="w-4 h-4 text-primary" /> Cohort Breakdown
+                                </h3>
                                 {loadingCohort === module.id ? (
                                   <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
                                 ) : cohortData[module.id] && cohortData[module.id].length > 0 ? (
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                                     <div className="h-48 w-full">
                                       <ResponsiveContainer width="100%" height="100%">
                                         <BarChart layout="vertical" data={cohortData[module.id]} margin={{ left: 40, right: 40 }}>
@@ -448,8 +438,48 @@ const ModulesPage = () => {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="text-center py-8 text-text-muted text-sm">No cohort data available for this module.</div>
+                                  <div className="text-center py-8 text-text-muted text-sm mb-8">No cohort data available for this module.</div>
                                 )}
+
+                                {/* 👇 2. NOUVELLE SECTION: Statistiques Descriptives (Pandas) 👇 */}
+                                <div className="border-t border-border/20 pt-8">
+                                  <h3 className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center gap-2 mb-6">
+                                    <Calculator className="w-4 h-4 text-primary" /> Advanced Statistics (Pandas EDA)
+                                  </h3>
+                                  {loadingStats === module.id ? (
+                                    <div className="flex justify-center py-4"><div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+                                  ) : advancedStats[module.id] ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                                      <div className="p-4 bg-surface/80 rounded-xl border border-border shadow-sm text-center">
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Moyenne</p>
+                                        <p className="text-xl font-black text-text-main">{advancedStats[module.id].mean}</p>
+                                      </div>
+                                      <div className="p-4 bg-surface/80 rounded-xl border border-border shadow-sm text-center">
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Médiane</p>
+                                        <p className="text-xl font-black text-text-main">{advancedStats[module.id].median}</p>
+                                      </div>
+                                      <div className="p-4 bg-surface/80 rounded-xl border border-border shadow-sm text-center">
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Écart-Type (σ)</p>
+                                        <p className="text-xl font-black text-text-main">{advancedStats[module.id].std_dev}</p>
+                                      </div>
+                                      <div className="p-4 bg-surface/80 rounded-xl border border-border shadow-sm text-center">
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Variance (σ²)</p>
+                                        <p className="text-xl font-black text-text-main">{advancedStats[module.id].variance}</p>
+                                      </div>
+                                      <div className="p-4 bg-surface/80 rounded-xl border border-border shadow-sm text-center">
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Quartile 1 (25%)</p>
+                                        <p className="text-xl font-black text-text-main">{advancedStats[module.id].q1}</p>
+                                      </div>
+                                      <div className="p-4 bg-surface/80 rounded-xl border border-border shadow-sm text-center">
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Quartile 3 (75%)</p>
+                                        <p className="text-xl font-black text-text-main">{advancedStats[module.id].q3}</p>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-center py-4 text-text-muted text-sm">No advanced statistics available.</div>
+                                  )}
+                                </div>
+
                               </div>
                             </motion.div>
                           </td>

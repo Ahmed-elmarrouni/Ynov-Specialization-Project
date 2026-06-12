@@ -15,6 +15,12 @@ const moduleService = {
     const response = await api.get(`/modules/${moduleId}/cohort-breakdown`);
     return response.data;
   },
+
+  getAdvancedStats: async (moduleId) => {
+    const response = await api.get(`/modules/${moduleId}/advanced-stats`);
+    return response.data;
+  }
+
 };
 
 export default moduleService;

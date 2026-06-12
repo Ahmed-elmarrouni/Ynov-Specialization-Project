@@ -1,47 +1,88 @@
-# Data Generation Process
+# Data Engineering & Database Architecture
 
-In this phase of the project, my goal was to generate a large amount of realistic data to fill my PostgreSQL database. This data is critical because I will need it later to train my Machine Learning models (for predicting student failure risk and clustering student profiles)
+This document details the data lifecycle of the EduTrack Analytics platform, covering the generation of synthetic correlated data, the relational database schema, and the advanced ETL (Extract, Transform, Load) pipeline used for data ingestion.
 
-## First Attempt: Using Mockaroo
+---
 
-I initially started using Mockaroo to generate my CSV files. However, I quickly ran into a major limitation. Mockaroo's free tier only allows you to generate a maximum of 1,000 rows per file.
+## 1. Data Generation Strategy
 
-Because one student can have multiple grades and absences, 1,000 rows total was not enough data for a real-world Machine Learning project. I needed thousands of rows to train an accurate model, so I stopped using Mockaroo.
+To train effective Machine Learning models (for risk prediction and clustering), the platform required a high-volume, realistic dataset.
 
-## Second Attempt: The Python Data Engineer Approach
+### First Attempt: Mockaroo Limitations
 
-To bypass the 1,000-row limit, I decided to write a custom Python script using the `pandas` and `faker` libraries.
+Initially, I used Mockaroo to generate CSV files. However, the free tier limits generation to 1,000 rows per file. Because a single student generates multiple grades and attendance records, 1,000 rows were vastly insufficient to train an accurate predictive model.
 
-This approach was much better because I could generate as much data as I wanted. More importantly, I programmed mathematical correlations into the data. For example, the script assigns a hidden "truancy" (absence) probability to students. If a student is absent often, their generated grades are mathematically lower
+### Second Attempt: Custom Python Data Engineering
 
-## Technical Errors and Solutions
+To bypass these limits, I developed a custom Python script (`generate_data.py`) using `pandas` and `faker`. This approach allowed me to generate an infinite amount of data while injecting **mathematical correlations** to simulate real-world behavior:
 
-While trying to run the Python script, I faced several environment errors on my Mac:
+- **Aptitude & Truancy Metrics:** Every synthetic student was assigned a hidden "aptitude" score and "truancy" (absence) probability.
+- **Correlated Grades:** If a student's truancy rate triggered an absence, their score for that evaluation was automatically set to 0. Otherwise, their grade was calculated using their aptitude plus a random variance.
 
-1. **`zsh: command not found: python`**: My Mac did not recognize the standard `python` command, so I had to use `python3` instead.
-2. **`ModuleNotFoundError: No module named 'pandas'`**: Even after installing the libraries, Python could not find them. This happened because my Mac has multiple versions of Python installed, and `pip` installed the packages into the wrong version.
-3. **`externally-managed-environment` Error**: When I tried to force the installation using `python3 -m pip`, macOS blocked me. Modern Macs protect the global system from being modified by external Python packages to prevent the OS from breaking.
-4. **Broken `requirements.txt`**: I tried to install packages from my `requirements.txt` file, but it failed with an `OSError` because the file contained hidden Apple internal paths that `pip` could not read.
+### Solving macOS Environment Constraints
 
-### How I Fixed It: Virtual Environments
+While executing the script, I encountered strict macOS environment protections (`externally-managed-environment` and `ModuleNotFoundError`). To solve this, I isolated the project using a **Python Virtual Environment (`venv`)**, allowing `pip` to safely install dependencies without interfering with the global Apple OS configurations.
 
-To solve all of these macOS protections and path errors, I created a **Python Virtual Environment (`venv`)**.
+**Final Result:** Over 10,000 rows of highly realistic, correlated data were successfully exported into 10 CSV files.
 
-By running `python3 -m venv venv` and activating it with `source venv/bin/activate`, I created a safe, isolated bubble for my project. Inside this virtual environment, I was able to successfully run `pip install pandas faker` without any macOS restrictions.
+---
 
-## Final Result
+## 2. Database Schema & Tables
 
-After fixing the environment, the script ran perfectly. I successfully generated 10 CSV files containing thousands of rows of realistic, mathematically correlated data:
+The database is built on PostgreSQL using a strict relational model. Below is a brief explanation of the core tables:
 
-- `academic_years.csv`
-- `cohort_modules.csv`
-- `cohorts.csv`
-- `evaluations.csv`
-- `grades.csv`
-- `modules.csv`
-- `programs.csv`
-- `students.csv`
-- `teachers.csv`
-- `users.csv`
+![Database Schema Diagram](../pics/schema_diagram.svg)
 
-The data is now safely stored in the `/data` folder, ready for the ETL (Extract, Transform, Load) pipeline!
+### Identity & Access
+
+- **`users`**: The central authentication table. Stores `first_name`, `last_name`, `email`, hashed passwords, and RBAC roles (Student, Teacher, Admin).
+- **`data_imports`**: Tracks the history, success rate, and error logs of all CSV files uploaded via the ETL pipeline.
+
+### Users Profiles
+
+- **`students`**: Linked to `users`. Stores the student ID (matricule), birth date, and their assigned `cohort_id`.
+- **`teachers`**: Linked to `users`. Stores the teacher's pedagogical specialty.
+
+### Academic Structure
+
+- **`academic_years`**: Defines the temporal scope (e.g., "2025-2026") and active status.
+- **`programs`**: The overarching degrees (e.g., "B3 Data & IA", "M1 Tech & Business").
+- **`cohorts`**: The specific class groups linking students to a Program and Academic Year.
+
+### Pedagogy & Scheduling
+
+- **`modules`**: The subjects taught, identified by a unique code (e.g., "DATA-301") and ECTS credits.
+- **`cohort_modules`**: The junction table assigning a specific `module` to a `cohort`, taught by a specific `teacher`.
+
+### Performance & Tracking
+
+- **`evaluations`**: The exams or projects assigned to a specific `cohort_module`, including their maximum score and weight percentage.
+- **`grades`**: The core metrics table storing the `score` achieved by a `student` in an `evaluation`. Includes an `is_absent` boolean.
+- **`attendance_records`**: Tracks student presence per session (Present, Absent, Late).
+
+---
+
+## 3. Advanced ETL Pipeline (Extract, Transform, Load)
+
+To handle user-uploaded data safely, I implemented a robust, class-based ETL pipeline (`cleaner.py` and `pipeline.py`) that acts as the ultimate authority on Data Governance.
+
+![ETL Architecture Diagram](../pics/etl_architecture.svg)
+
+### 1. Extract & Route
+
+The frontend parses the CSV and sends it to the FastAPI backend. The `process_import_payload` function acts as a smart router, reading the `target_table` parameter and dynamically matching it to the correct validation schema.
+
+### 2. Transform: Data Governance (`cleaner.py`)
+
+Before any data touches the database, the `ETLDataCleaner` class enforces strict business rules:
+
+- **Text Standardization:** Automatically converts emails to lowercase, first names to Title Case, and last names to UPPERCASE to prevent duplicates and maintain UI consistency.
+- **Mathematical Grade Clamping:** Safely coerces scores to floats. Grades are mathematically clamped between `0.0` and `20.0`. If the `is_absent` flag is True, the score is forcefully overridden to `0.0`.
+- **Enum Coercion:** Standardizes string variations of booleans (e.g., "yes", "1", "vrai") into actual boolean values, and maps random attendance strings strictly to recognized Enums (Present, Absent, Late).
+
+### 3. Load: Safe Upsert (`pipeline.py`)
+
+To prevent fatal `UniqueViolation` database crashes, the loading layer utilizes a safe **Upsert** logic:
+
+- **Sequence Synchronization:** Before insertion, PostgreSQL ID sequences (`setval`) are explicitly synchronized to ensure manual seeds do not conflict with auto-incrementing primary keys.
+- **Update or Insert:** The pipeline queries the database using unique constraints (like `email` or `student_id`). If the record exists, it updates the existing row. If it doesn't, it inserts a new one.

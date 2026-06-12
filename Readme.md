@@ -7,5 +7,8 @@
 - **Classe :** B3 - AI & Data Engineering
 - **Module :** Project Specialization
 
-520a847af05b4c71b5787f0b880e2c11
-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
+## Technical Documentation
+
+- [Data Science Notebook](docs/NOTEBOOK.md)
+- [Data Engineering Overview](docs/DATA.md)
+- [Backend Architecture](docs/BE.md)
