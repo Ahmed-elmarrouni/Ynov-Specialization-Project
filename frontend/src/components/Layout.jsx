@@ -82,16 +82,17 @@ const Layout = () => {
       >
         {/* Sidebar Header */}
         <div className="h-20 flex items-center justify-between px-4 border-b border-border/50">
+
           <AnimatePresence mode="wait">
             {isOpen && (
-              <motion.h1
+              <motion.img
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="text-lg font-bold text-primary tracking-tight whitespace-nowrap overflow-hidden"
-              >
-                EduTrack.
-              </motion.h1>
+                src="/EduTrack-Logo.jpeg"
+                alt="EduTrack Logo"
+                className="h-10 w-auto"
+              />
             )}
           </AnimatePresence>
           <button
