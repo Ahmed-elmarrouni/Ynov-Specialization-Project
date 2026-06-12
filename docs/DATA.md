@@ -31,7 +31,7 @@ While executing the script, I encountered strict macOS environment protections (
 
 The database is built on PostgreSQL using a strict relational model. Below is a brief explanation of the core tables:
 
-![Database Schema Diagram](../pics/schema_diagram.svg)
+![Database Schema Diagram](../diagrams/DB-Schema.svg)
 
 ### Identity & Access
 
@@ -66,7 +66,7 @@ The database is built on PostgreSQL using a strict relational model. Below is a 
 
 To handle user-uploaded data safely, I implemented a robust, class-based ETL pipeline (`cleaner.py` and `pipeline.py`) that acts as the ultimate authority on Data Governance.
 
-![ETL Architecture Diagram](../pics/etl_architecture.svg)
+![ETL Architecture Diagram](../diagrams/ETL-Architecture-Diagram.svg)
 
 ### 1. Extract & Route
 
