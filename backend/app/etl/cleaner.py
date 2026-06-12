@@ -10,12 +10,17 @@ class ETLDataCleaner:
     @staticmethod
     def _clean_generic(df: pd.DataFrame, required_columns: list) -> pd.DataFrame:
         df = df.dropna(how='all')
-        
         df = df.dropna(subset=required_columns)
         
         for col in df.select_dtypes(['object']).columns:
             df[col] = df[col].astype(str).str.strip()
             
+            if 'date' in col.lower():
+                try:
+                    df[col] = pd.to_datetime(df[col]).dt.date
+                except:
+                    pass 
+                    
         return df
 
     @classmethod
